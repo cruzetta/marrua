@@ -3,33 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marruá Consultoria - Maximize seu Lucro no Abate</title>
+    <title>Marruá Consultoria - Evite Perdas no Abate</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
     <!-- Chosen Palette: Earthy Neutrals with Gold and Green Accents -->
-    <!-- Application Structure Plan: A top-to-bottom narrative SPA. 1. Hook: An interactive loss calculator to personalize the problem. 2. Solution: Clear value proposition of Marruá. 3. Details: An interactive tabbed section explaining specific problems Marruá solves. 4. ROI: A dynamic chart comparing cost vs. savings, directly linked to the calculator. 5. Offer & CTA: A prominent section for the free first consultancy and contact. This structure is designed to guide the user from understanding their personal financial loss to seeing a clear, low-risk solution, maximizing conversion potential. -->
-    <!-- Visualization & Content Choices: 1. Loss Calculator (HTML/JS): Goal is to engage & inform. Interaction via sliders/inputs to make the financial impact tangible. 2. Process Tabs (HTML/JS): Goal is to organize & detail. Organizes complex info into clickable tabs, preventing overwhelm and allowing self-paced exploration. 3. ROI Chart (Chart.js Bar Chart): Goal is to compare & persuade. Visually proves the "investment, not cost" argument by dynamically showing the value gained versus the service cost. This is more impactful than text alone. -->
+    <!-- Application Structure Plan: A top-to-bottom narrative SPA. 1. Hook: An interactive loss calculator to personalize the problem. 2. Solution: Clear value proposition of Marruá, emphasizing proactive correction. 3. Details: An expanded interactive tabbed section with all 9 critical processes. 4. Offer & CTA: A prominent section for the free first consultancy and contact. The ROI section was removed to focus solely on the user's potential loss. -->
+    <!-- Visualization & Content Choices: 1. Loss Calculator (HTML/JS): Goal is to engage & inform. Interaction via sliders/inputs to make the financial impact tangible. 2. Process Tabs (HTML/JS): Goal is to organize & detail. Expanded to 9 tabs to cover all critical points from the source material, allowing deep, self-paced exploration. 3. Placeholder images guide content population. -->
     <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
         body {
             font-family: 'Inter', sans-serif;
-        }
-        .chart-container {
-            position: relative;
-            width: 100%;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            height: 300px;
-            max-height: 400px;
-        }
-        @media (min-width: 768px) {
-            .chart-container {
-                height: 400px;
-            }
         }
         .tab-button.active {
             border-color: #ca8a04; /* yellow-600 */
@@ -39,6 +24,14 @@
         .smooth-scroll {
             scroll-behavior: smooth;
         }
+        /* Custom scrollbar for tab navigation */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
     </style>
 </head>
 <body class="bg-stone-50 text-stone-800 smooth-scroll">
@@ -46,11 +39,11 @@
     <header class="bg-white shadow-md sticky top-0 z-50">
         <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
             <h1 class="text-2xl font-bold text-yellow-600">Marruá Consultoria</h1>
-            <div class="hidden md:flex space-x-6">
-                <a href="#problema" class="text-stone-600 hover:text-yellow-600">O Problema</a>
-                <a href="#solucao" class="text-stone-600 hover:text-yellow-600">A Solução</a>
-                <a href="#investimento" class="text-stone-600 hover:text-yellow-600">Investimento</a>
-                <a href="#contato" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">Agendar Consultoria</a>
+            <div class="hidden md:flex space-x-6 items-center">
+                <a href="#problema" class="text-stone-600 hover:text-yellow-600">O Prejuízo</a>
+                <a href="#solucao" class="text-stone-600 hover:text-yellow-600">Nossa Atuação</a>
+                <a href="#processo" class="text-stone-600 hover:text-yellow-600">Pontos Críticos</a>
+                <a href="#contato" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg">Agendar Avaliação</a>
             </div>
             <div class="md:hidden">
                 <a href="#contato" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-4 rounded-lg text-sm">Agendar</a>
@@ -62,7 +55,7 @@
 
         <section id="problema" class="text-center mb-16 md:mb-24">
             <h2 class="text-3xl md:text-5xl font-bold mb-4">Você está deixando dinheiro no frigorífico.</h2>
-            <p class="text-lg md:text-xl text-stone-600 max-w-3xl mx-auto mb-8">Meses de investimento em genética, nutrição e sanidade podem ser perdidos em poucas horas por falhas no processo de abate. Calcule sua perda potencial e veja o quanto você pode estar deixando de ganhar.</p>
+            <p class="text-lg md:text-xl text-stone-600 max-w-3xl mx-auto mb-8">Meses de investimento em genética, nutrição e sanidade podem ser perdidos em poucas horas por falhas no processo de abate. Calcule seu prejuízo potencial e veja o quanto seu lucro está em risco.</p>
             
             <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg max-w-4xl mx-auto border border-stone-200">
                 <div class="grid md:grid-cols-2 gap-6 md:gap-8 items-center">
@@ -78,13 +71,13 @@
                         </div>
                         <div>
                             <label for="valorArroba" class="block font-semibold mb-2 text-left">Valor da Arroba (@) em R$</label>
-                            <input type="number" id="valorArroba" value="300" class="w-full p-3 border border-stone-300 rounded-lg text-center text-lg font-semibold">
+                            <input type="number" id="valorArroba" value="315" class="w-full p-3 border border-stone-300 rounded-lg text-center text-lg font-semibold">
                         </div>
                     </div>
                     <div class="bg-red-50 text-center p-6 rounded-xl border-2 border-dashed border-red-200">
-                        <p class="text-stone-600 text-lg mb-2">Sua perda estimada é de:</p>
-                        <h3 id="perdaTotal" class="text-4xl md:text-5xl font-bold text-red-600">R$ 5.000,00</h3>
-                        <p class="text-stone-500 mt-2">com base em uma perda média de <strong id="perdaMediaAnimal">R$ 50,00</strong> por animal.</p>
+                        <p class="text-stone-600 text-lg mb-2">Seu prejuízo potencial é de:</p>
+                        <h3 id="perdaTotal" class="text-4xl md:text-5xl font-bold text-red-600">R$ 5.250,00</h3>
+                        <p class="text-stone-500 mt-2">com base em uma perda média de <strong id="perdaMediaAnimal">R$ 52,50</strong> por animal.</p>
                     </div>
                 </div>
             </div>
@@ -92,176 +85,163 @@
 
         <section id="solucao" class="mb-16 md:mb-24">
             <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Nós somos seus olhos e sua voz no frigorífico.</h2>
-                <p class="text-lg text-stone-600 max-w-3xl mx-auto">A Marruá Consultoria acompanha pessoalmente cada etapa do abate do seu lote, defendendo seu resultado e garantindo que você receba por cada grama de carcaça que produziu. Nosso serviço é fiscalizar e otimizar, transformando perdas em lucro para você.</p>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Mais que olhos: somos ação e correção.</h2>
+                <p class="text-lg text-stone-600 max-w-3xl mx-auto">No ambiente dinâmico do frigorífico, não adianta apenas apontar um erro. É preciso ter o conhecimento técnico e a atitude para garantir que a correção seja feita na hora. A Marruá atua como seu especialista em tempo real, defendendo cada grama do seu trabalho.</p>
             </div>
             
             <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                 <div class="bg-white p-6 rounded-lg shadow text-center border-t-4 border-yellow-500">
-                    <h3 class="font-bold text-xl mb-2">Fiscalização da Balança</h3>
-                    <p class="text-stone-600">Garantimos a pesagem correta e justa do seu gado, sem perdas indevidas.</p>
+                    <h3 class="font-bold text-xl mb-2">Ação Imediata</h3>
+                    <p class="text-stone-600">Identificamos desvios e atuamos na hora para corrigir o processo, minimizando perdas.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow text-center border-t-4 border-yellow-500">
-                    <h3 class="font-bold text-xl mb-2">Classificação Precisa</h3>
-                    <p class="text-stone-600">Conferimos a tipificação para que você receba todas as bonificações a que tem direito.</p>
+                    <h3 class="font-bold text-xl mb-2">Defesa Técnica</h3>
+                    <p class="text-stone-600">Argumentamos tecnicamente para garantir a classificação justa e o pagamento de bonificações.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow text-center border-t-4 border-yellow-500">
-                    <h3 class="font-bold text-xl mb-2">Acompanhamento de Toalete</h3>
-                    <p class="text-stone-600">Evitamos remoções excessivas que diminuem o peso da carcaça e seu lucro.</p>
+                    <h3 class="font-bold text-xl mb-2">Prevenção de Perdas</h3>
+                    <p class="text-stone-600">Nosso acompanhamento evita remoções excessivas e garante o máximo rendimento de carcaça.</p>
                 </div>
                 <div class="bg-white p-6 rounded-lg shadow text-center border-t-4 border-yellow-500">
-                    <h3 class="font-bold text-xl mb-2">Relatório Completo</h3>
-                    <p class="text-stone-600">Você recebe um relatório detalhado e transparente com fotos e dados do abate.</p>
+                    <h3 class="font-bold text-xl mb-2">Relatório Detalhado</h3>
+                    <p class="text-stone-600">Você recebe um laudo completo com fotos e dados para entender os resultados do seu lote.</p>
                 </div>
             </div>
         </section>
 
         <section id="processo" class="mb-16 md:mb-24">
             <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Onde o seu lucro desaparece?</h2>
-                <p class="text-lg text-stone-600 max-w-3xl mx-auto">Pequenos erros operacionais, somados, geram um grande prejuízo. Nossa equipe técnica identifica e corrige essas falhas em tempo real. Veja os pontos mais críticos que monitoramos durante o abate.</p>
+                <h2 class="text-3xl md:text-4xl font-bold mb-4">Os 9 Pontos Críticos Onde Seu Lucro Desaparece</h2>
+                <p class="text-lg text-stone-600 max-w-3xl mx-auto">Pequenos erros operacionais, somados, geram um grande prejuízo. Nossa equipe técnica monitora e corrige ativamente estas falhas. Conheça cada ponto:</p>
             </div>
 
-            <div class="w-full max-w-5xl mx-auto">
-                <div class="mb-6 overflow-x-auto pb-2">
-                    <div id="tab-buttons" class="flex space-x-2 md:space-x-4 border-b border-stone-200">
-                        <button data-tab="esfola" class="tab-button active flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Esfola</button>
-                        <button data-tab="reata" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Reata</button>
-                        <button data-tab="sangria" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Sangria</button>
-                        <button data-tab="ligamento" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Ligamento Cervical</button>
-                        <button data-tab="abscesso" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Abscesso Vacinal</button>
-                        <button data-tab="dif" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Contaminações (DIF)</button>
+            <div class="w-full max-w-6xl mx-auto">
+                <div class="relative">
+                    <div id="tab-container" class="mb-6 overflow-x-auto pb-2 no-scrollbar">
+                        <div id="tab-buttons" class="flex space-x-1 md:space-x-2 border-b border-stone-200 w-max">
+                            <button data-tab="esfola" class="tab-button active flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Esfola</button>
+                            <button data-tab="reata" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Reata</button>
+                            <button data-tab="sangria" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Sangria</button>
+                            <button data-tab="ligamento" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Ligamento</button>
+                            <button data-tab="abscesso" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Abscesso</button>
+                            <button data-tab="contaminacao" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Contaminação</button>
+                            <button data-tab="queda" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Queda</button>
+                            <button data-tab="doenca" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Doença</button>
+                            <button data-tab="bezerros" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 border-transparent hover:text-yellow-600">Bezerros</button>
+                        </div>
                     </div>
                 </div>
 
-                <div id="tab-content" class="bg-white p-6 md:p-8 rounded-lg shadow-inner border border-stone-100 min-h-[350px]">
+                <div id="tab-content" class="bg-white p-6 md:p-8 rounded-lg shadow-inner border border-stone-100 min-h-[380px]">
+                    
                     <div id="esfola" class="tab-pane">
                         <div class="grid md:grid-cols-2 gap-8 items-center">
                             <div>
-                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">Esfola do Quarto/Matambre</h3>
-                                <p class="text-stone-600 mb-4">Garantimos a remoção precisa do couro, preservando o matambre intacto. Erros nesta etapa, que são comuns, podem gerar perdas significativas por carcaça.</p>
-                                <div class="bg-red-50 p-4 rounded-lg mt-4">
-                                    <p class="font-semibold text-red-700">Perda estimada por erro: <span class="text-xl font-bold">300g a 800g</span> por carcaça.</p>
-                                </div>
+                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">1. Esfola do Quarto/Matambre</h3>
+                                <p class="text-stone-600 mb-4">A remoção do couro deve ser precisa. Erros comuns podem retirar parte do matambre junto, impactando diretamente o peso da carcaça.</p>
+                                <div class="bg-red-50 p-4 rounded-lg mt-4"><p class="font-semibold text-red-700">Prejuízo Potencial: <span class="text-xl font-bold">300g a 800g</span> por carcaça.</p></div>
                             </div>
-                            <div class="mt-4 md:mt-0">
-                                 <img src="imagens/esfola.jpg" alt="Exemplo de erro na esfola da carcaça" class="rounded-lg shadow-md w-full max-w-md mx-auto">
-                            </div>
+                            <div class="mt-4 md:mt-0"><img src="imagens/esfola.jpg" alt="Exemplo de erro na esfola da carcaça" class="rounded-lg shadow-md w-full max-w-md mx-auto"></div>
                         </div>
                     </div>
+
                     <div id="reata" class="tab-pane hidden">
                         <div class="grid md:grid-cols-2 gap-8 items-center">
                             <div>
-                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">Reata</h3>
-                                <p class="text-stone-600 mb-4">O couro deve ser baixado até o cupim, sem ultrapassar o limite. Se puxado além do ponto, pode haver perda de gordura aderida, reduzindo o rendimento.</p>
-                                <div class="bg-red-50 p-4 rounded-lg mt-4">
-                                    <p class="font-semibold text-red-700">Perda estimada por erro: <span class="text-xl font-bold">200g a 600g</span> por carcaça.</p>
-                                </div>
+                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">2. Reata</h3>
+                                <p class="text-stone-600 mb-4">O couro deve ser baixado só até o cupim. Puxar além do limite arranca gordura aderida, o que diminui o rendimento da carcaça.</p>
+                                <div class="bg-red-50 p-4 rounded-lg mt-4"><p class="font-semibold text-red-700">Prejuízo Potencial: <span class="text-xl font-bold">200g a 600g</span> por carcaça.</p></div>
                             </div>
-                            <div class="mt-4 md:mt-0">
-                                 <img src="imagens/reata.jpg" alt="Exemplo de erro no processo de reata" class="rounded-lg shadow-md w-full max-w-md mx-auto">
-                            </div>
+                            <div class="mt-4 md:mt-0"><img src="imagens/reata.jpg" alt="Exemplo de erro no processo de reata" class="rounded-lg shadow-md w-full max-w-md mx-auto"></div>
                         </div>
                     </div>
+
                     <div id="sangria" class="tab-pane hidden">
                         <div class="grid md:grid-cols-2 gap-8 items-center">
                             <div>
-                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">Sangria</h3>
-                                <p class="text-stone-600 mb-4">A retirada do "colar" deve ser feita com precisão. Uma remoção excessiva nesta área impacta diretamente o peso final da carcaça.</p>
-                                 <div class="bg-red-50 p-4 rounded-lg mt-4">
-                                    <p class="font-semibold text-red-700">Perda estimada por erro: <span class="text-xl font-bold">200g a 500g</span> por carcaça.</p>
-                                </div>
+                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">3. Sangria</h3>
+                                <p class="text-stone-600 mb-4">A remoção do "colar" deve ser precisa. Retirar carne em excesso nesta área é um erro comum que impacta o peso final.</p>
+                                <div class="bg-red-50 p-4 rounded-lg mt-4"><p class="font-semibold text-red-700">Prejuízo Potencial: <span class="text-xl font-bold">200g a 500g</span> por carcaça.</p></div>
                             </div>
-                            <div class="mt-4 md:mt-0">
-                                 <img src="imagens/sangria.jpg" alt="Exemplo de remoção excessiva na sangria" class="rounded-lg shadow-md w-full max-w-md mx-auto">
-                            </div>
+                            <div class="mt-4 md:mt-0"><img src="imagens/sangria.jpg" alt="Exemplo de remoção excessiva na sangria" class="rounded-lg shadow-md w-full max-w-md mx-auto"></div>
                         </div>
                     </div>
-                     <div id="ligamento" class="tab-pane hidden">
-                        <div class="grid md:grid-cols-2 gap-8 items-center">
-                            <div>
-                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">Ligamento Cervical</h3>
-                                <p class="text-stone-600 mb-4">A retirada do ligamento cervical deve ser feita com precisão, evitando remoção excessiva de carne. O ideal é que o ligamento seja removido limpo, garantindo o melhor aproveitamento.</p>
-                                 <div class="bg-red-50 p-4 rounded-lg mt-4">
-                                    <p class="font-semibold text-red-700">Perda estimada por erro: <span class="text-xl font-bold">300g a 700g</span> por carcaça.</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 md:mt-0">
-                                 <img src="imagens/ligamento.jpg" alt="Exemplo de erro na remoção do ligamento cervical" class="rounded-lg shadow-md w-full max-w-md mx-auto">
-                            </div>
-                        </div>
-                    </div>
-                     <div id="abscesso" class="tab-pane hidden">
-                        <div class="grid md:grid-cols-2 gap-8 items-center">
-                            <div>
-                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">Abscesso Vacinal</h3>
-                                <p class="text-stone-600 mb-4">A remoção do abscesso é obrigatória, mas deve ser feita com precisão cirúrgica. Erros nessa etapa podem resultar na perda excessiva de carne nobre.</p>
-                                 <div class="bg-red-50 p-4 rounded-lg mt-4">
-                                    <p class="font-semibold text-red-700">Perda estimada por erro: <span class="text-xl font-bold">200g a 800g</span> por carcaça.</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 md:mt-0">
-                                 <img src="imagens/abscesso.jpg" alt="Exemplo de remoção incorreta de abscesso vacinal" class="rounded-lg shadow-md w-full max-w-md mx-auto">
-                            </div>
-                        </div>
-                    </div>
-                     <div id="dif" class="tab-pane hidden">
-                        <div class="grid md:grid-cols-2 gap-8 items-center">
-                            <div>
-                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">Contaminações e Quedas (DIF)</h3>
-                                <p class="text-stone-600 mb-4">Contaminações por conteúdo ruminal ou quedas da carcaça exigem limpeza no Departamento de Inspeção Final (DIF). Sem acompanhamento, a carne pode ser descartada sem pesagem ou compensação.</p>
-                                 <div class="bg-red-50 p-4 rounded-lg mt-4">
-                                    <p class="font-semibold text-red-700">Perda mínima estimada: <span class="text-xl font-bold">2kg</span> por carcaça, podendo ser muito maior.</p>
-                                </div>
-                            </div>
-                            <div class="mt-4 md:mt-0">
-                                 <img src="imagens/dif.jpg" alt="Carcaça sendo enviada para o DIF por contaminação" class="rounded-lg shadow-md w-full max-w-md mx-auto">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
 
-        <section id="investimento" class="mb-16 md:mb-24">
-             <div class="text-center mb-12">
-                <h2 class="text-3xl md:text-4xl font-bold mb-4">Um investimento que se paga.</h2>
-                <p class="text-lg text-stone-600 max-w-3xl mx-auto">Nosso serviço não é um custo. É um investimento com retorno garantido. O valor que recuperamos para você no abate cobre o nosso serviço e, na maioria dos casos, aumenta seu lucro final. Veja a comparação com base nos seus dados.</p>
-            </div>
-            <div class="bg-white p-6 md:p-8 rounded-2xl shadow-lg border border-stone-200">
-                <div class="grid md:grid-cols-2 gap-8 items-center">
-                    <div>
-                        <h3 class="text-2xl font-bold mb-4">Seu Retorno Sobre o Investimento</h3>
-                        <div class="space-y-4">
-                            <div class="p-4 bg-stone-100 rounded-lg">
-                                <p class="font-semibold">Custo da Consultoria</p>
-                                <p class="text-lg font-bold text-yellow-600" id="custoConsultoria">R$ 800,00</p>
-                                <p class="text-sm text-stone-500">(R$ 8,00 por animal)</p>
+                    <div id="ligamento" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">4. Ligamento Cervical</h3>
+                                <p class="text-stone-600 mb-4">A retirada do ligamento deve ser "limpa". Remover carne junto é um desperdício que afeta o aproveitamento da carcaça.</p>
+                                <div class="bg-red-50 p-4 rounded-lg mt-4"><p class="font-semibold text-red-700">Prejuízo Potencial: <span class="text-xl font-bold">300g a 700g</span> por carcaça.</p></div>
                             </div>
-                            <div class="p-4 bg-emerald-50 rounded-lg">
-                                <p class="font-semibold">Ganho Recuperado Estimado</p>
-                                <p class="text-lg font-bold text-emerald-600" id="ganhoRecuperado">R$ 5.000,00</p>
-                                <p class="text-sm text-stone-500">(Média de R$ 50,00 por animal)</p>
-                            </div>
-                            <div class="p-4 bg-blue-50 rounded-lg">
-                                <p class="font-semibold">Seu Lucro Líquido Extra</p>
-                                <p class="text-2xl font-bold text-blue-600" id="lucroLiquido">R$ 4.200,00</p>
-                            </div>
-                             <p class="text-sm text-stone-500 italic text-center pt-2">O custo de deslocamento (R$ 2,00/km) não está incluso neste cálculo.</p>
+                            <div class="mt-4 md:mt-0"><img src="imagens/ligamento.jpg" alt="Exemplo de erro na remoção do ligamento cervical" class="rounded-lg shadow-md w-full max-w-md mx-auto"></div>
                         </div>
                     </div>
-                    <div class="chart-container">
-                        <canvas id="roiChart"></canvas>
+
+                    <div id="abscesso" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">5. Abscesso Vacinal</h3>
+                                <p class="text-stone-600 mb-4">A remoção do abscesso é obrigatória, mas deve ser cirúrgica. Retirar carne nobre em excesso ao redor é um prejuízo direto.</p>
+                                <div class="bg-red-50 p-4 rounded-lg mt-4"><p class="font-semibold text-red-700">Prejuízo Potencial: <span class="text-xl font-bold">200g a 800g</span> por carcaça.</p></div>
+                            </div>
+                            <div class="mt-4 md:mt-0"><img src="imagens/abscesso.jpg" alt="Exemplo de remoção incorreta de abscesso vacinal" class="rounded-lg shadow-md w-full max-w-md mx-auto"></div>
+                        </div>
                     </div>
+
+                    <div id="contaminacao" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">6. D.I.F - Contaminação</h3>
+                                <p class="text-stone-600 mb-4">O estouro do rúmen pode contaminar a carcaça. Sem acompanhamento, a carne pode ser descartada ou limpa com excesso, sem a devida compensação.</p>
+                                <div class="bg-red-50 p-4 rounded-lg mt-4"><p class="font-semibold text-red-700">Prejuízo Potencial: Mínimo de <span class="text-xl font-bold">3kg</span> por carcaça.</p></div>
+                            </div>
+                            <div class="mt-4 md:mt-0"><img src="imagens/contaminacao.jpg" alt="Carcaça contaminada" class="rounded-lg shadow-md w-full max-w-md mx-auto"></div>
+                        </div>
+                    </div>
+
+                    <div id="queda" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">7. D.I.F - Queda da Carcaça</h3>
+                                <p class="text-stone-600 mb-4">Uma carcaça que cai do gancho é contaminada. A limpeza no D.I.F. pode resultar em grandes perdas de carne se não for acompanhada de perto.</p>
+                                <div class="bg-red-50 p-4 rounded-lg mt-4"><p class="font-semibold text-red-700">Prejuízo Potencial: Mínimo de <span class="text-xl font-bold">5kg</span> por carcaça.</p></div>
+                            </div>
+                            <div class="mt-4 md:mt-0"><img src="imagens/queda.jpg" alt="Carcaça caída no chão do frigorífico" class="rounded-lg shadow-md w-full max-w-md mx-auto"></div>
+                        </div>
+                    </div>
+                    
+                    <div id="doenca" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">8. D.I.F - Desvio por Doença</h3>
+                                <p class="text-stone-600 mb-4">Quando uma carcaça é desviada, acompanhamos a análise veterinária, documentando o processo para garantir que apenas o necessário seja descartado.</p>
+                                <div class="bg-red-50 p-4 rounded-lg mt-4"><p class="font-semibold text-red-700">Prejuízo Potencial: Variável, pode chegar à perda de <span class="text-xl font-bold">toda a carcaça</span>.</p></div>
+                            </div>
+                            <div class="mt-4 md:mt-0"><img src="imagens/doenca.jpg" alt="Veterinário inspecionando carcaça no D.I.F." class="rounded-lg shadow-md w-full max-w-md mx-auto"></div>
+                        </div>
+                    </div>
+
+                    <div id="bezerros" class="tab-pane hidden">
+                        <div class="grid md:grid-cols-2 gap-8 items-center">
+                            <div>
+                                <h3 class="text-2xl font-bold text-yellow-600 mb-3">9. Bezerros em Abate (Peso Vivo)</h3>
+                                <p class="text-stone-600 mb-4">A inclusão indevida de bezerros no romaneio gera cobranças erradas no pagamento final, um prejuízo oculto e significativo.</p>
+                                <div class="bg-red-50 p-4 rounded-lg mt-4"><p class="font-semibold text-red-700">Prejuízo Potencial: Até <span class="text-xl font-bold">R$600</span> por bezerro incluído indevidamente.</p></div>
+                            </div>
+                            <div class="mt-4 md:mt-0"><img src="imagens/bezerros.jpg" alt="Bezerro em lote de abate" class="rounded-lg shadow-md w-full max-w-md mx-auto"></div>
+                        </div>
+                    </div>
+
                 </div>
             </div>
         </section>
 
         <section id="contato" class="bg-yellow-600 text-white text-center rounded-2xl p-8 md:p-16">
-            <h2 class="text-3xl md:text-4xl font-bold mb-4">Experimente sem Risco.</h2>
-            <p class="text-lg md:text-xl text-yellow-100 max-w-3xl mx-auto mb-8">Acreditamos tanto no nosso trabalho que sua primeira consultoria de abate é por nossa conta. Vamos ao frigorífico, realizamos o acompanhamento completo e entregamos o relatório com os resultados, **sem nenhum custo para você.**</p>
-            <a href="https://wa.me/5567992196499?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20minha%20primeira%20consultoria%20gratuita%21" target="_blank" class="bg-white text-yellow-600 font-bold text-xl py-4 px-8 rounded-lg shadow-lg hover:bg-yellow-50 transform hover:scale-105 transition-transform inline-block">
-                Agende sua Consultoria Gratuita
+            <h2 class="text-3xl md:text-4xl font-bold mb-4">Avalie seu Prejuízo na Prática, Sem Custo.</h2>
+            <p class="text-lg md:text-xl text-yellow-100 max-w-3xl mx-auto mb-8">Acreditamos tanto em nosso trabalho que fazemos um convite: sua primeira avaliação de abate é por nossa conta. Vamos ao frigorífico, realizamos o acompanhamento completo e entregamos o relatório com os resultados, **sem nenhum custo para você.**</p>
+            <a href="https://wa.me/5567992196499?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20minha%20avalia%C3%A7%C3%A3o%20de%20abate%20gratuita%21" target="_blank" class="bg-white text-yellow-600 font-bold text-xl py-4 px-8 rounded-lg shadow-lg hover:bg-yellow-50 transform hover:scale-105 transition-transform inline-block">
+                Agende sua Avaliação Gratuita
             </a>
             <p class="mt-4 text-yellow-200">Clique para falar diretamente conosco pelo WhatsApp.</p>
         </section>
@@ -271,7 +251,7 @@
     <footer class="bg-stone-800 text-white py-8">
         <div class="container mx-auto px-6 text-center">
             <p>&copy; 2025 Marruá Consultoria. Todos os direitos reservados.</p>
-            <p class="text-stone-400 text-sm">Maximizando o lucro da pecuária.</p>
+            <p class="text-stone-400 text-sm">Protegendo o lucro da pecuária.</p>
         </div>
     </footer>
 
@@ -283,13 +263,7 @@
             const perdaTotalDisplay = document.getElementById('perdaTotal');
             const perdaMediaAnimalDisplay = document.getElementById('perdaMediaAnimal');
 
-            const custoConsultoriaDisplay = document.getElementById('custoConsultoria');
-            const ganhoRecuperadoDisplay = document.getElementById('ganhoRecuperado');
-            const lucroLiquidoDisplay = document.getElementById('lucroLiquido');
-
             const perdaMediaPorKg = 2.5;
-            const custoPorAnimal = 8;
-            let roiChart;
 
             function formatCurrency(value) {
                 return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
@@ -307,77 +281,6 @@
 
                 perdaMediaAnimalDisplay.textContent = formatCurrency(perdaPorAnimal);
                 perdaTotalDisplay.textContent = formatCurrency(perdaTotal);
-
-                const custoTotalConsultoria = numCabecas * custoPorAnimal;
-                const ganhoTotalRecuperado = perdaTotal; 
-                const lucroLiquido = ganhoTotalRecuperado - custoTotalConsultoria;
-
-                custoConsultoriaDisplay.textContent = formatCurrency(custoTotalConsultoria);
-                ganhoRecuperadoDisplay.textContent = formatCurrency(ganhoTotalRecuperado);
-                lucroLiquidoDisplay.textContent = formatCurrency(lucroLiquido > 0 ? lucroLiquido : 0);
-                
-                updateChart(custoTotalConsultoria, ganhoTotalRecuperado);
-            }
-
-            function updateChart(custo, ganho) {
-                roiChart.data.datasets[0].data = [custo, ganho];
-                roiChart.update();
-            }
-
-            function createChart() {
-                const ctx = document.getElementById('roiChart').getContext('2d');
-                roiChart = new Chart(ctx, {
-                    type: 'bar',
-                    data: {
-                        labels: ['Custo do Serviço', 'Ganho Recuperado'],
-                        datasets: [{
-                            label: 'Comparativo Financeiro (R$)',
-                            data: [0, 0],
-                            backgroundColor: [
-                                'rgba(202, 138, 4, 0.6)', // yellow-600
-                                'rgba(5, 150, 105, 0.6)' // emerald-600
-                            ],
-                            borderColor: [
-                                'rgba(202, 138, 4, 1)',
-                                'rgba(5, 150, 105, 1)'
-                            ],
-                            borderWidth: 1
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    callback: function(value) {
-                                        return formatCurrency(value);
-                                    }
-                                }
-                            }
-                        },
-                        plugins: {
-                            legend: {
-                                display: false
-                            },
-                            tooltip: {
-                                callbacks: {
-                                    label: function(context) {
-                                        let label = context.dataset.label || '';
-                                        if (label) {
-                                            label += ': ';
-                                        }
-                                        if (context.parsed.y !== null) {
-                                            label += formatCurrency(context.parsed.y);
-                                        }
-                                        return label;
-                                    }
-                                }
-                            }
-                        }
-                    }
-                });
             }
 
             numCabecasSlider.addEventListener('input', updateCalculations);
@@ -405,7 +308,7 @@
                 });
             });
 
-            createChart();
+            // Initialize calculator
             updateCalculations(); 
         });
     </script>
