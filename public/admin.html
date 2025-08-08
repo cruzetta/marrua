@@ -183,8 +183,7 @@
                 const querySnapshot = await getDocs(collection(db, "siteContent"));
                 if (querySnapshot.empty) {
                     console.warn("A coleção 'siteContent' está vazia. A usar dados de fallback.");
-                    // **FIX:** Process fallback data to add IDs
-                    siteSections = JSON.parse(JSON.stringify(fallbackData)); // Deep copy
+                    siteSections = JSON.parse(JSON.stringify(fallbackData)); 
                     for (const key in siteSections) {
                         siteSections[key].id = key;
                     }
@@ -198,8 +197,7 @@
             } catch (error) {
                 dashboardLayout.innerHTML = `<p class="text-red-500 text-center p-10">Erro ao carregar conteúdo: ${error.message}</p>`;
                 console.error("Erro ao carregar do Firebase, a usar dados de fallback.", error);
-                // **FIX:** Also process fallback data on error
-                siteSections = JSON.parse(JSON.stringify(fallbackData)); // Deep copy
+                siteSections = JSON.parse(JSON.stringify(fallbackData)); 
                 for (const key in siteSections) {
                     siteSections[key].id = key;
                 }
@@ -217,7 +215,7 @@
                             <h3 class="font-bold text-lg mb-4 px-2">Gerir Conteúdo</h3>
                             <nav id="admin-sidebar" class="space-y-1">
                                 ${order.map(id => {
-                                    const section = siteSections[id];
+                                    const section = siteSections[id] || fallbackData[id];
                                     if (!section) return '';
                                     return `<a href="#" data-section-id="${id}" class="admin-nav-link flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-200 transition-colors">
                                                 ${section.icon || ''}
@@ -242,7 +240,6 @@
                 if (link) {
                     const sectionId = link.dataset.sectionId;
                     
-                    // Atualiza o estado ativo
                     sidebar.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
                     link.classList.add('active');
 
@@ -250,10 +247,8 @@
                 }
             });
 
-            // Adiciona o listener de clique para o botão salvar usando delegação de evento
             document.getElementById('admin-main-content').addEventListener('click', handleSaveClick);
 
-            // Renderiza a primeira seção por padrão
             if (sidebar.querySelector('.admin-nav-link')) {
                 sidebar.querySelector('.admin-nav-link').click();
             }
@@ -286,7 +281,6 @@
 
         function renderFormInputs(section) {
             let inputs = '';
-            // Define a ordem para uma melhor organização dos campos
             const fieldOrder = ['title', 'subtitle', 'backgroundVideoUrl', 'backgroundImageUrl', 'cta', 'secondary_cta', 'tabs'];
             const processedKeys = new Set(['id', 'type', 'name', 'icon', 'features']);
 
@@ -350,7 +344,6 @@
             const originalSection = siteSections[sectionId];
             const updatedSectionData = {}; 
 
-            // Coleta todos os dados do formulário
             editorDiv.querySelectorAll('.section-input').forEach(input => {
                 const keys = input.dataset.key.split('.');
                 if (keys.length > 1) {
@@ -378,9 +371,13 @@
                 button.disabled = true;
                 const sectionRef = doc(db, "siteContent", sectionId);
 
-                await setDoc(sectionRef, updatedSectionData);
+                // --- CORREÇÃO APLICADA AQUI ---
+                // Usamos { merge: true } para garantir que os campos não editados 
+                // (como 'name', 'icon', 'features') não sejam apagados do Firestore.
+                await setDoc(sectionRef, updatedSectionData, { merge: true });
                 
                 // Atualiza os dados locais com os que foram salvos
+                // É importante mesclar os dados aqui também para manter o estado local consistente
                 siteSections[sectionId] = { ...originalSection, ...updatedSectionData };
                 
                 showNotification();
