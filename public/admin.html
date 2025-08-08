@@ -1,301 +1,307 @@
-import React, { useState, useEffect } from 'react';
-// Importações do Firebase
-import { initializeApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
-import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore';
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel Administrativo - Marruá</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+    </style>
+</head>
+<body class="bg-gray-100">
 
-
-// --- Configuração do Firebase ---
-// Suas credenciais foram inseridas aqui.
-const firebaseConfig = {
-  apiKey: "AIzaSyCP_QD2ekfd1qif82Eg02eKg6Xuqnsfl80",
-  authDomain: "marrua-consultoria.firebaseapp.com",
-  projectId: "marrua-consultoria",
-  storageBucket: "marrua-consultoria.firebasestorage.app",
-  messagingSenderId: "274732967705",
-  appId: "1:274732967705:web:9349b6256ea095d39f8788",
-  measurementId: "G-BM7CLYZJ1K"
-};
-
-// Inicializa o Firebase e os serviços
-const app = initializeApp(firebaseConfig);
-const auth = getAuth(app);
-const db = getFirestore(app);
-
-
-// --- Componente de Input Genérico ---
-const FormInput = ({ label, value, onChange, placeholder, type = 'text' }) => (
-    <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
-        {type === 'textarea' ? (
-            <textarea
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder || label}
-                rows="3"
-                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-            />
-        ) : (
-            <input
-                type={type}
-                value={value}
-                onChange={onChange}
-                placeholder={placeholder || label}
-                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
-            />
-        )}
-    </div>
-);
-
-// --- Componente Editor de Seção ---
-const SectionEditor = ({ section, onSave, onCancel }) => {
-    const [editedSection, setEditedSection] = useState(section);
-    const [isSaving, setIsSaving] = useState(false);
-
-    const handleInputChange = (field, value) => {
-        setEditedSection(prev => ({ ...prev, [field]: value }));
-    };
-
-    const handleCtaChange = (ctaField, field, value) => {
-        setEditedSection(prev => ({
-            ...prev,
-            [ctaField]: { ...prev[ctaField], [field]: value }
-        }));
-    };
-    
-    const handleTabChange = (tabIndex, field, value) => {
-        const newTabs = [...editedSection.tabs];
-        newTabs[tabIndex] = { ...newTabs[tabIndex], [field]: value };
-        setEditedSection(prev => ({ ...prev, tabs: newTabs }));
-    };
-    
-    const handleSaveClick = async () => {
-        setIsSaving(true);
-        await onSave(editedSection);
-        setIsSaving(false);
-    };
-
-    return (
-        <div className="bg-white p-6 rounded-lg shadow-lg">
-            <h3 className="text-2xl font-bold text-gray-800 mb-6">Editando: {section.name}</h3>
-            <div className="space-y-4">
-                {Object.keys(section).map(key => {
-                    // Campos não editáveis
-                    if (['id', 'type', 'name', 'features', 'tabs', 'backgroundColor', 'textColor'].includes(key)) return null;
-
-                    // Campos de CTA (botões)
-                    if (key === 'cta' || key === 'secondary_cta') {
-                        if (!editedSection[key]) return null;
-                        return (
-                            <div key={key} className="p-4 border rounded-md space-y-3">
-                                <h4 className="font-semibold text-lg capitalize">{key.replace('_', ' ')}</h4>
-                                <FormInput label="Texto do Botão" value={editedSection[key].text} onChange={e => handleCtaChange(key, 'text', e.target.value)} />
-                                <FormInput label="Link do Botão" value={editedSection[key].link} onChange={e => handleCtaChange(key, 'link', e.target.value)} />
-                            </div>
-                        );
-                    }
-                    
-                    // Campos de Mídia
-                    if (key === 'backgroundVideoUrl' || key === 'backgroundImageUrl') {
-                         return <FormInput key={key} label="URL da Mídia de Fundo (Vídeo/Imagem)" value={editedSection[key] || ''} onChange={e => handleInputChange(key, e.target.value)} />
-                    }
-
-                    // Campos de texto genéricos
-                    return <FormInput key={key} label={key.charAt(0).toUpperCase() + key.slice(1)} value={editedSection[key]} onChange={e => handleInputChange(key, e.target.value)} type={typeof editedSection[key] === 'string' && editedSection[key].length > 100 ? 'textarea' : 'text'}/>
-                })}
-
-                {/* Editor para a seção de abas (tabs) */}
-                {section.type === 'tabs' && (
-                    <div className="space-y-6">
-                        <h4 className="font-semibold text-lg mt-6 mb-2">Abas dos Pontos Críticos</h4>
-                        {editedSection.tabs.map((tab, index) => (
-                            <div key={tab.id} className="p-4 border rounded-md space-y-3">
-                                <h5 className="font-bold">{tab.name}</h5>
-                                <FormInput label="Título" value={tab.title} onChange={e => handleTabChange(index, 'title', e.target.value)} />
-                                <FormInput label="Conteúdo" value={tab.content} onChange={e => handleTabChange(index, 'content', e.target.value)} type="textarea" />
-                                <FormInput label="Prejuízo" value={tab.loss} onChange={e => handleTabChange(index, 'loss', e.target.value)} />
-                                <FormInput label="URL da Imagem" value={tab.imageUrl} onChange={e => handleTabChange(index, 'imageUrl', e.target.value)} />
-                            </div>
-                        ))}
-                    </div>
-                )}
-            </div>
-            <div className="mt-8 flex justify-end space-x-4">
-                <button onClick={onCancel} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50" disabled={isSaving}>Cancelar</button>
-                <button onClick={handleSaveClick} className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-md hover:bg-yellow-600 disabled:opacity-50" disabled={isSaving}>
-                    {isSaving ? 'Salvando...' : 'Salvar Alterações'}
-                </button>
-            </div>
+    <!-- Tela de Login -->
+    <div id="login-screen" class="min-h-screen flex items-center justify-center bg-gray-800">
+        <div class="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
+            <h1 class="text-3xl font-bold text-center text-gray-800 mb-2">Painel Marruá</h1>
+            <p class="text-center text-gray-500 mb-8">Acesso Administrativo</p>
+            <form id="login-form" class="space-y-6">
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <input type="email" id="login-email" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500" />
+                </div>
+                <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Senha</label>
+                    <input type="password" id="login-password" required class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500" />
+                </div>
+                <p id="login-error" class="text-red-500 text-sm text-center hidden"></p>
+                <div>
+                    <button type="submit" class="w-full bg-yellow-500 text-black font-bold py-3 px-4 rounded-md hover:bg-yellow-600 transition-colors text-lg">Entrar</button>
+                </div>
+            </form>
         </div>
-    );
-};
+    </div>
 
+    <!-- Painel Principal (Dashboard) -->
+    <div id="dashboard-screen" class="hidden">
+        <header class="bg-white shadow">
+            <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+                <h1 class="text-2xl font-bold text-gray-800">Painel Marruá</h1>
+                <button id="logout-button" class="font-semibold text-gray-600 hover:text-yellow-600">Sair</button>
+            </div>
+        </header>
+        <main id="dashboard-content" class="container mx-auto px-6 py-8">
+            <!-- Conteúdo do admin será carregado aqui -->
+        </main>
+    </div>
 
-// --- Componente do Dashboard ---
-const Dashboard = ({ onLogout }) => {
-    const [sections, setSections] = useState([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [selectedSection, setSelectedSection] = useState(null);
-    const [showNotification, setShowNotification] = useState('');
-    const [error, setError] = useState('');
+    <!-- Notificação de Sucesso -->
+    <div id="notification" class="fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg hidden">
+        Salvo com sucesso!
+    </div>
 
-    useEffect(() => {
-        const fetchSections = async () => {
-            try {
-                const querySnapshot = await getDocs(collection(db, "siteContent"));
-                const sectionsArray = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-                const order = ['home', 'prejuizo', 'solucao', 'pontos-criticos', 'contato'];
-                const orderedSections = sectionsArray.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
-                setSections(orderedSections);
-            } catch (err) {
-                console.error("Erro ao buscar seções:", err);
-                setError("Não foi possível carregar os dados do site. Verifique sua conexão e as configurações do Firebase.");
-            } finally {
-                setIsLoading(false);
+    <!-- Firebase Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-app.js";
+        import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-auth.js";
+        import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore.js";
+
+        const firebaseConfig = {
+          apiKey: "AIzaSyCP_QD2ekfd1qif82Eg02eKg6Xuqnsfl80",
+          authDomain: "marrua-consultoria.firebaseapp.com",
+          projectId: "marrua-consultoria",
+          storageBucket: "marrua-consultoria.firebasestorage.app",
+          messagingSenderId: "274732967705",
+          appId: "1:274732967705:web:9349b6256ea095d39f8788",
+          measurementId: "G-BM7CLYZJ1K"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getFirestore(app);
+
+        const loginScreen = document.getElementById('login-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        const dashboardContent = document.getElementById('dashboard-content');
+        let siteSections = {};
+        
+        // --- DADOS INICIAIS (Fallback) ---
+        const fallbackData = {
+            home: {
+                name: "Secção Principal (Hero)",
+                title: 'Seu lucro não pode virar prejuízo no final da linha.',
+                subtitle: 'A Marruá Consultoria garante que cada grama do seu investimento seja valorizada no frigorífico. Atuamos onde o seu trabalho é mais vulnerável.',
+                backgroundVideoUrl: 'https://firebasestorage.googleapis.com/v0/b/platamais.firebasestorage.app/o/saude%20kangen%20brasil%2FV%C3%ADdeo%20sem%20t%C3%ADtulo.mp4?alt=media&token=78e9f776-133d-4e18-be82-556a4700bd5d',
+                cta: { text: 'Calcular meu prejuízo', link: '#prejuizo' },
+                secondary_cta: { text: 'Fale com um especialista', link: 'https://wa.me/5567992196499' }
+            },
+            prejuizo: {
+                name: "Calculadora de Prejuízo",
+                title: 'Você está deixando dinheiro no frigorífico.',
+                subtitle: 'Meses de investimento em genética, nutrição e sanidade podem ser perdidos em poucas horas por falhas no processo de abate. Calcule seu prejuízo potencial e veja o quanto seu lucro está em risco.'
+            },
+            solucao: {
+                name: "Nossa Atuação (Funcionalidades)",
+                title: 'Mais que olhos: somos ação e correção.',
+                subtitle: 'No ambiente dinâmico do frigorífico, não adianta apenas apontar um erro. É preciso ter o conhecimento técnico e a atitude para garantir que a correção seja feita na hora. A Marruá atua como seu especialista em tempo real, defendendo cada grama do seu trabalho.',
+                features: [
+                    { title: 'Ação Imediata', description: 'Identificamos desvios e atuamos na hora para corrigir o processo, minimizando perdas.' },
+                    { title: 'Defesa Técnica', description: 'Argumentamos tecnicamente para garantir a classificação justa e o pagamento de bonificações.' },
+                    { title: 'Prevenção de Perdas', description: 'Nosso acompanhamento evita remoções excessivas e garante o máximo rendimento de carcaça.' },
+                    { title: 'Relatório Detalhado', description: 'Você recebe um laudo completo com fotos e dados para entender os resultados do seu lote.' },
+                ]
+            },
+            'pontos-criticos': {
+                name: "Pontos Críticos (Abas)",
+                title: 'Os 9 Pontos Críticos Onde Seu Lucro Desaparece',
+                subtitle: 'Pequenos erros operacionais, somados, geram um grande prejuízo. Nossa equipe técnica monitora e corrige ativamente estas falhas. Conheça cada ponto:',
+                tabs: [
+                    { id: 'esfola', name: 'Esfola', title: '1. Esfola do Quarto/Matambre', content: 'A remoção do couro deve ser precisa. Erros comuns podem retirar parte do matambre junto, impactando diretamente o peso da carcaça.', loss: '300g a 800g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Esfola' },
+                    { id: 'reata', name: 'Reata', title: '2. Reata', content: 'O couro deve ser baixado até o cupim; caso contrário, haverá remoção de gordura aderida, reduzindo o rendimento da carcaça.', loss: '200g a 600g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Reata' },
+                    { id: 'sangria', name: 'Sangria', title: '3. Sangria', content: 'A remoção da sangria deve ser precisa. Retirar carne em excesso nesta área é um erro comum que impacta o peso final.', loss: '200g a 500g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Sangria' },
+                    { id: 'ligamento', name: 'Ligamento', title: '4. Ligamento Cervical', content: 'A retirada do ligamento deve ser "limpa". Remover carne junto é um desperdício que afeta o aproveitamento da carcaça.', loss: '300g a 700g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Ligamento' },
+                    { id: 'abscesso', name: 'Abscesso', title: '5. Abscesso Vacinal', content: 'A remoção do abscesso é obrigatória, mas deve ser precisa. Retirar carne em excesso ao redor é um prejuízo direto.', loss: '200g a 800g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Abscesso' },
+                    { id: 'contaminacao', name: 'Contaminação', title: '6. D.I.F - Contaminação', content: 'O estouro do rúmen pode contaminar a carcaça. Sem acompanhamento, pode haver retirada de quilos de carne sem a correspondente compensação.', loss: 'Mínimo de 3kg', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Contaminação' },
+                    { id: 'queda', name: 'Queda', title: '7. D.I.F - Queda da Carcaça', content: 'Uma carcaça que cai do gancho é contaminada. A limpeza no D.I.F. pode resultar em grandes perdas de carne se não for acompanhada de perto.', loss: 'Mínimo de 5kg', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Queda' },
+                    { id: 'doenca', name: 'Doença', title: '8. D.I.F - Desvio por Doença', content: 'Quando uma carcaça é desviada, acompanhamos a avaliação do veterinário, documentando o processo para garantir que apenas o necessário seja descartado.', loss: 'Variável, até 100%', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Doença' },
+                    { id: 'bezerros', name: 'Bezerros', title: '9. Bezerros em Abate', content: 'A inclusão indevida de bezerros no romaneio gera cobranças erradas no pagamento final, um prejuízo oculto e significativo.', loss: 'Até R$600/bezerro', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Bezerros' },
+                ]
+            },
+            contato: {
+                name: "Chamada Final (CTA)",
+                title: 'Sua Próxima Abate, Zero Prejuízo.',
+                subtitle: 'Nossa confiança no resultado é total. Por isso, a primeira avaliação é um presente. Acompanhamos seu lote, identificamos as perdas e entregamos um diagnóstico completo. Sem custos, sem compromisso.',
+                backgroundImageUrl: 'https://images.unsplash.com/photo-1444956927939-0c98d03c12a8?q=80&w=2070&auto=format&fit=crop',
+                cta: { text: 'Agendar Avaliação Gratuita', link: 'https://wa.me/5567992196499?text=Ol%C3%A1%2C%20gostaria%20de%20agendar%20minha%20avalia%C3%A7%C3%A3o%20de%20abate%20gratuita%21' }
             }
         };
-        fetchSections();
-    }, []);
 
-    const handleSave = async (updatedSection) => {
-        try {
-            const sectionRef = doc(db, "siteContent", updatedSection.id);
-            await setDoc(sectionRef, updatedSection, { merge: true });
-            
-            setSections(prev => prev.map(s => s.id === updatedSection.id ? updatedSection : s));
-            setSelectedSection(null);
-            
-            setShowNotification('Seção salva com sucesso!');
-            setTimeout(() => setShowNotification(''), 3000);
-        } catch (err) {
-            console.error("Erro ao salvar seção:", err);
-            setError("Falha ao salvar. Verifique o console para mais detalhes.");
-        }
-    };
-
-    if (isLoading) {
-        return <div className="flex justify-center items-center h-screen font-bold text-xl">Carregando Painel...</div>;
-    }
-
-    return (
-        <div className="min-h-screen bg-gray-100">
-            <header className="bg-white shadow">
-                <div className="container mx-auto px-6 py-4 flex justify-between items-center">
-                    <h1 className="text-2xl font-bold text-gray-800">Painel Marruá</h1>
-                    <button onClick={onLogout} className="font-semibold text-gray-600 hover:text-yellow-600">Sair</button>
-                </div>
-            </header>
-            <main className="container mx-auto px-6 py-8">
-                {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">{error}</div>}
-                {selectedSection ? (
-                    <SectionEditor section={selectedSection} onSave={handleSave} onCancel={() => setSelectedSection(null)} />
-                ) : (
-                    <div>
-                        <h2 className="text-3xl font-bold text-gray-800 mb-6">Gerenciar Seções do Site</h2>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                            {sections.map(section => (
-                                <div key={section.id} className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
-                                    <div>
-                                        <h3 className="font-bold text-xl text-gray-800">{section.name}</h3>
-                                        <p className="text-gray-500 text-sm mt-1">ID: {section.id}</p>
-                                    </div>
-                                    <button onClick={() => setSelectedSection(section)} className="mt-4 w-full bg-gray-800 text-white font-bold py-2 px-4 rounded-md hover:bg-black transition-colors">
-                                        Editar
-                                    </button>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
-            </main>
-            {showNotification && (
-                <div className="fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg animate-fade-in-up">
-                    {showNotification}
-                </div>
-            )}
-        </div>
-    );
-};
-
-// --- Componente de Login ---
-const LoginScreen = ({ onLoginSuccess }) => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
-    const [error, setError] = useState('');
-    const [isLoading, setIsLoading] = useState(false);
-
-    const handleLogin = async (e) => {
-        e.preventDefault();
-        setError('');
-        setIsLoading(true);
-        try {
-            await signInWithEmailAndPassword(auth, email, password);
-            onLoginSuccess();
-        } catch (err) {
-            setError('Credenciais inválidas ou erro de conexão.');
-            console.error(err);
-        } finally {
-            setIsLoading(false);
-        }
-    };
-
-    return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-800">
-            <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
-                <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">Painel Marruá</h1>
-                <p className="text-center text-gray-500 mb-8">Acesso Administrativo</p>
-                <form onSubmit={handleLogin} className="space-y-6">
-                    <FormInput label="Email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" type="email" />
-                    <FormInput label="Senha" value={password} onChange={e => setPassword(e.target.value)} placeholder="********" type="password" />
-                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-                    <div>
-                        <button type="submit" className="w-full bg-yellow-500 text-black font-bold py-3 px-4 rounded-md hover:bg-yellow-600 transition-colors text-lg disabled:opacity-50" disabled={isLoading}>
-                            {isLoading ? 'Entrando...' : 'Entrar'}
-                        </button>
-                    </div>
-                </form>
-            </div>
-        </div>
-    );
-};
-
-
-// --- Componente Principal da Aplicação ---
-export default function App() {
-    const [user, setUser] = useState(null);
-    const [isLoading, setIsLoading] = useState(true);
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            setUser(user);
-            setIsLoading(false);
+        // --- Lógica de Autenticação ---
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                loginScreen.classList.add('hidden');
+                dashboardScreen.classList.remove('hidden');
+                loadDashboard();
+            } else {
+                loginScreen.classList.remove('hidden');
+                dashboardScreen.classList.add('hidden');
+            }
         });
-        return () => unsubscribe();
-    }, []);
-    
-    const handleLogout = async () => {
-        await signOut(auth);
-    };
 
-    if (isLoading) {
-        return <div className="flex justify-center items-center h-screen font-bold text-xl">Verificando autenticação...</div>
-    }
+        const loginForm = document.getElementById('login-form');
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            const errorP = document.getElementById('login-error');
+            errorP.classList.add('hidden');
+            try {
+                await signInWithEmailAndPassword(auth, email, password);
+            } catch (error) {
+                errorP.innerText = "Email ou senha inválidos.";
+                errorP.classList.remove('hidden');
+            }
+        });
 
-    return (
-         <div className="font-sans">
-             <style jsx global>{`
-                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap');
-                body { font-family: 'Inter', sans-serif; }
-                h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
-                @keyframes fadeInUp {
-                    from { opacity: 0; transform: translateY(20px); }
-                    to { opacity: 1; transform: translateY(0); }
+        const logoutButton = document.getElementById('logout-button');
+        logoutButton.addEventListener('click', () => signOut(auth));
+
+
+        // --- Lógica do Dashboard ---
+        async function loadDashboard() {
+            dashboardContent.innerHTML = `<p>A carregar conteúdo...</p>`;
+            try {
+                const querySnapshot = await getDocs(collection(db, "siteContent"));
+                if (querySnapshot.empty) {
+                    console.warn("A coleção 'siteContent' está vazia. A usar dados de fallback.");
+                    siteSections = fallbackData;
+                } else {
+                    siteSections = {};
+                    querySnapshot.forEach(doc => {
+                        siteSections[doc.id] = { id: doc.id, ...doc.data() };
+                    });
                 }
-                .animate-fade-in-up {
-                    animation: fadeInUp 0.5s ease-out forwards;
+                renderDashboard();
+            } catch (error) {
+                dashboardContent.innerHTML = `<p class="text-red-500">Erro ao carregar conteúdo: ${error.message}</p>`;
+                console.error("Erro ao carregar do Firebase, a usar dados de fallback.", error);
+                siteSections = fallbackData;
+                renderDashboard();
+            }
+        }
+        
+        function renderDashboard() {
+            const order = ['home', 'prejuizo', 'solucao', 'pontos-criticos', 'contato'];
+            dashboardContent.innerHTML = `
+                <h2 class="text-3xl font-bold text-gray-800 mb-6">Gerir Secções do Site</h2>
+                <div class="space-y-6">
+                    ${order.map(id => renderSectionEditor(siteSections[id])).join('')}
+                </div>
+            `;
+            addSaveListeners();
+        }
+        
+        function renderSectionEditor(section) {
+            if (!section) return '';
+            return `
+                <div id="editor-${section.id || section.name.toLowerCase()}" class="bg-white p-6 rounded-lg shadow-lg">
+                    <h3 class="text-2xl font-bold text-gray-800 mb-6">${section.name}</h3>
+                    <div class="space-y-4">
+                        ${renderFormInputs(section)}
+                    </div>
+                    <div class="mt-8 flex justify-end">
+                        <button data-id="${section.id || section.name.toLowerCase()}" class="save-button px-6 py-2 bg-yellow-500 text-black font-bold rounded-md hover:bg-yellow-600">Salvar Alterações</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderFormInputs(section) {
+            let inputs = '';
+            for (const key in section) {
+                if (['id', 'type', 'name', 'features'].includes(key)) continue;
+
+                if (key === 'tabs') {
+                    inputs += `<h4 class="font-semibold text-lg mt-6 mb-2">Abas dos Pontos Críticos</h4>`;
+                    inputs += section.tabs.map((tab, index) => `
+                        <div class="p-4 border rounded-md space-y-3">
+                            <h5 class="font-bold">${tab.name}</h5>
+                            <label class="block text-sm font-medium text-gray-700">Título</label>
+                            <input data-key="title" data-index="${index}" class="tab-input w-full p-2 border rounded" value="${tab.title}">
+                            <label class="block text-sm font-medium text-gray-700">Conteúdo</label>
+                            <textarea data-key="content" data-index="${index}" class="tab-input w-full p-2 border rounded">${tab.content}</textarea>
+                            <label class="block text-sm font-medium text-gray-700">Prejuízo</label>
+                            <input data-key="loss" data-index="${index}" class="tab-input w-full p-2 border rounded" value="${tab.loss}">
+                            <label class="block text-sm font-medium text-gray-700">URL da Imagem</label>
+                            <input data-key="imageUrl" data-index="${index}" class="tab-input w-full p-2 border rounded" value="${tab.imageUrl}">
+                        </div>
+                    `).join('');
+                } else if (typeof section[key] === 'object' && section[key] !== null) {
+                    inputs += `<h4 class="font-semibold text-lg mt-4 capitalize">${key.replace('_', ' ')}</h4>`;
+                    for (const subKey in section[key]) {
+                        inputs += `
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 capitalize">${subKey}</label>
+                                <input data-key="${key}.${subKey}" class="section-input w-full p-2 border rounded" value="${section[key][subKey]}">
+                            </div>
+                        `;
+                    }
+                } else {
+                     inputs += `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 capitalize">${key.replace('Url', ' URL')}</label>
+                            <textarea data-key="${key}" class="section-input w-full p-2 border rounded">${section[key]}</textarea>
+                        </div>
+                    `;
                 }
-            `}</style>
-            {user ? <Dashboard onLogout={handleLogout} /> : <LoginScreen onLoginSuccess={() => {}} />}
-        </div>
-    );
-}
+            }
+            return inputs;
+        }
+
+        function addSaveListeners() {
+            document.querySelectorAll('.save-button').forEach(button => {
+                button.addEventListener('click', async (e) => {
+                    const sectionId = e.target.dataset.id;
+                    const editorDiv = document.getElementById(`editor-${sectionId}`);
+                    const updatedSection = JSON.parse(JSON.stringify(siteSections[sectionId])); // Deep copy
+
+                    editorDiv.querySelectorAll('.section-input').forEach(input => {
+                        const keys = input.dataset.key.split('.');
+                        if (keys.length > 1) {
+                            updatedSection[keys[0]][keys[1]] = input.value;
+                        } else {
+                            updatedSection[keys[0]] = input.value;
+                        }
+                    });
+
+                    if (updatedSection.tabs) {
+                        editorDiv.querySelectorAll('.tab-input').forEach(input => {
+                            const index = input.dataset.index;
+                            const key = input.dataset.key;
+                            updatedSection.tabs[index][key] = input.value;
+                        });
+                    }
+                    
+                    try {
+                        e.target.innerText = "A salvar...";
+                        e.target.disabled = true;
+                        const sectionRef = doc(db, "siteContent", sectionId);
+                        // Remove 'id' se existir para não o salvar no documento
+                        delete updatedSection.id; 
+                        await setDoc(sectionRef, updatedSection);
+                        siteSections[sectionId] = { id: sectionId, ...updatedSection };
+                        showNotification();
+                    } catch (error) {
+                        alert("Erro ao salvar: " + error.message);
+                    } finally {
+                         e.target.innerText = "Salvar Alterações";
+                         e.target.disabled = false;
+                    }
+                });
+            });
+        }
+        
+        function showNotification() {
+            const notification = document.getElementById('notification');
+            notification.classList.remove('hidden');
+            setTimeout(() => notification.classList.add('hidden'), 3000);
+        }
+
+    </script>
+</body>
+</html>
