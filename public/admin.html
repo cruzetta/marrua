@@ -178,15 +178,12 @@
 
         // --- Lógica do Dashboard ---
         async function loadDashboard() {
-            dashboardLayout.innerHTML = `<p class="text-center p-10">A carregar conteúdo...</p>`;
+            dashboardLayout.innerHTML = `<p>A carregar conteúdo...</p>`;
             try {
                 const querySnapshot = await getDocs(collection(db, "siteContent"));
                 if (querySnapshot.empty) {
                     console.warn("A coleção 'siteContent' está vazia. A usar dados de fallback.");
-                    siteSections = JSON.parse(JSON.stringify(fallbackData)); 
-                    for (const key in siteSections) {
-                        siteSections[key].id = key;
-                    }
+                    siteSections = fallbackData;
                 } else {
                     siteSections = {};
                     querySnapshot.forEach(doc => {
@@ -195,12 +192,9 @@
                 }
                 renderAdminLayout();
             } catch (error) {
-                dashboardLayout.innerHTML = `<p class="text-red-500 text-center p-10">Erro ao carregar conteúdo: ${error.message}</p>`;
+                dashboardLayout.innerHTML = `<p class="text-red-500">Erro ao carregar conteúdo: ${error.message}</p>`;
                 console.error("Erro ao carregar do Firebase, a usar dados de fallback.", error);
-                siteSections = JSON.parse(JSON.stringify(fallbackData)); 
-                for (const key in siteSections) {
-                    siteSections[key].id = key;
-                }
+                siteSections = fallbackData;
                 renderAdminLayout();
             }
         }
@@ -215,7 +209,7 @@
                             <h3 class="font-bold text-lg mb-4 px-2">Gerir Conteúdo</h3>
                             <nav id="admin-sidebar" class="space-y-1">
                                 ${order.map(id => {
-                                    const section = siteSections[id] || fallbackData[id];
+                                    const section = siteSections[id];
                                     if (!section) return '';
                                     return `<a href="#" data-section-id="${id}" class="admin-nav-link flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-200 transition-colors">
                                                 ${section.icon || ''}
@@ -226,9 +220,7 @@
                         </div>
                     </aside>
                     <main id="admin-main-content" class="w-full">
-                        <div class="bg-white p-6 rounded-lg shadow-lg text-center">
-                            <p class="text-gray-500">Selecione uma seção no menu ao lado para começar a editar.</p>
-                        </div>
+                        <!-- O editor da seção será renderizado aqui -->
                     </main>
                 </div>
             `;
@@ -240,6 +232,7 @@
                 if (link) {
                     const sectionId = link.dataset.sectionId;
                     
+                    // Atualiza o estado ativo
                     sidebar.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
                     link.classList.add('active');
 
@@ -247,11 +240,11 @@
                 }
             });
 
+            // Adiciona o listener de clique para o botão salvar usando delegação de evento
             document.getElementById('admin-main-content').addEventListener('click', handleSaveClick);
 
-            if (sidebar.querySelector('.admin-nav-link')) {
-                sidebar.querySelector('.admin-nav-link').click();
-            }
+            // Renderiza a primeira seção por padrão
+            sidebar.querySelector('.admin-nav-link').click();
         }
         
         function renderSectionInMain(sectionId) {
@@ -281,12 +274,15 @@
 
         function renderFormInputs(section) {
             let inputs = '';
+            // Define a ordem para uma melhor organização dos campos
             const fieldOrder = ['title', 'subtitle', 'backgroundVideoUrl', 'backgroundImageUrl', 'cta', 'secondary_cta', 'tabs'];
             const processedKeys = new Set(['id', 'type', 'name', 'icon', 'features']);
 
-            const allKeys = [...fieldOrder, ...Object.keys(section).filter(k => !fieldOrder.includes(k) && !processedKeys.has(k))];
+            const allKeys = [...fieldOrder, ...Object.keys(section).filter(k => !fieldOrder.includes(k))];
 
             for (const key of allKeys) {
+                if (processedKeys.has(key)) continue;
+
                 if (key === 'tabs' && Array.isArray(section.tabs)) {
                     inputs += `<h4 class="font-semibold text-lg mt-6 mb-2 border-t pt-4">Abas dos Pontos Críticos</h4>`;
                     inputs += section.tabs.map((tab, index) => `
@@ -331,6 +327,7 @@
                         </div>
                     `;
                 }
+                processedKeys.add(key);
             }
             return inputs;
         }
@@ -341,44 +338,39 @@
             const button = e.target;
             const sectionId = button.dataset.id;
             const editorDiv = document.getElementById(`editor-${sectionId}`);
-            const originalSection = siteSections[sectionId];
-            const updatedSectionData = {}; 
+            const updatedSection = JSON.parse(JSON.stringify(siteSections[sectionId])); // Deep copy
 
             editorDiv.querySelectorAll('.section-input').forEach(input => {
                 const keys = input.dataset.key.split('.');
                 if (keys.length > 1) {
-                    if (!updatedSectionData[keys[0]]) {
-                        updatedSectionData[keys[0]] = {};
-                    }
-                    updatedSectionData[keys[0]][keys[1]] = input.value;
+                    updatedSection[keys[0]][keys[1]] = input.value;
                 } else {
-                    updatedSectionData[keys[0]] = input.value;
+                    updatedSection[keys[0]] = input.value;
                 }
             });
 
-            if (originalSection.tabs) {
-                const updatedTabs = JSON.parse(JSON.stringify(originalSection.tabs));
+            if (updatedSection.tabs) {
                 editorDiv.querySelectorAll('.tab-input').forEach(input => {
                     const index = input.dataset.index;
                     const key = input.dataset.key;
-                    updatedTabs[index][key] = input.value;
+                    updatedSection.tabs[index][key] = input.value;
                 });
-                updatedSectionData.tabs = updatedTabs;
             }
             
             try {
                 button.innerText = "A salvar...";
                 button.disabled = true;
                 const sectionRef = doc(db, "siteContent", sectionId);
+                
+                // Remove campos que não devem ser salvos no documento
+                delete updatedSection.id; 
+                delete updatedSection.name; 
+                delete updatedSection.icon; 
 
-                // --- CORREÇÃO APLICADA AQUI ---
-                // Usamos { merge: true } para garantir que os campos não editados 
-                // (como 'name', 'icon', 'features') não sejam apagados do Firestore.
-                await setDoc(sectionRef, updatedSectionData, { merge: true });
+                await setDoc(sectionRef, updatedSection);
                 
                 // Atualiza os dados locais com os que foram salvos
-                // É importante mesclar os dados aqui também para manter o estado local consistente
-                siteSections[sectionId] = { ...originalSection, ...updatedSectionData };
+                siteSections[sectionId] = { id: sectionId, name: siteSections[sectionId].name, icon: siteSections[sectionId].icon, ...updatedSection };
                 
                 showNotification();
             } catch (error) {
