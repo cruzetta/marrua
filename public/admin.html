@@ -1,0 +1,301 @@
+import React, { useState, useEffect } from 'react';
+// Importações do Firebase
+import { initializeApp } from 'firebase/app';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
+import { getFirestore, collection, getDocs, doc, setDoc } from 'firebase/firestore';
+
+
+// --- Configuração do Firebase ---
+// Suas credenciais foram inseridas aqui.
+const firebaseConfig = {
+  apiKey: "AIzaSyCP_QD2ekfd1qif82Eg02eKg6Xuqnsfl80",
+  authDomain: "marrua-consultoria.firebaseapp.com",
+  projectId: "marrua-consultoria",
+  storageBucket: "marrua-consultoria.firebasestorage.app",
+  messagingSenderId: "274732967705",
+  appId: "1:274732967705:web:9349b6256ea095d39f8788",
+  measurementId: "G-BM7CLYZJ1K"
+};
+
+// Inicializa o Firebase e os serviços
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+
+// --- Componente de Input Genérico ---
+const FormInput = ({ label, value, onChange, placeholder, type = 'text' }) => (
+    <div>
+        <label className="block text-sm font-medium text-gray-700 mb-1">{label}</label>
+        {type === 'textarea' ? (
+            <textarea
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder || label}
+                rows="3"
+                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+            />
+        ) : (
+            <input
+                type={type}
+                value={value}
+                onChange={onChange}
+                placeholder={placeholder || label}
+                className="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-yellow-500 focus:border-yellow-500"
+            />
+        )}
+    </div>
+);
+
+// --- Componente Editor de Seção ---
+const SectionEditor = ({ section, onSave, onCancel }) => {
+    const [editedSection, setEditedSection] = useState(section);
+    const [isSaving, setIsSaving] = useState(false);
+
+    const handleInputChange = (field, value) => {
+        setEditedSection(prev => ({ ...prev, [field]: value }));
+    };
+
+    const handleCtaChange = (ctaField, field, value) => {
+        setEditedSection(prev => ({
+            ...prev,
+            [ctaField]: { ...prev[ctaField], [field]: value }
+        }));
+    };
+    
+    const handleTabChange = (tabIndex, field, value) => {
+        const newTabs = [...editedSection.tabs];
+        newTabs[tabIndex] = { ...newTabs[tabIndex], [field]: value };
+        setEditedSection(prev => ({ ...prev, tabs: newTabs }));
+    };
+    
+    const handleSaveClick = async () => {
+        setIsSaving(true);
+        await onSave(editedSection);
+        setIsSaving(false);
+    };
+
+    return (
+        <div className="bg-white p-6 rounded-lg shadow-lg">
+            <h3 className="text-2xl font-bold text-gray-800 mb-6">Editando: {section.name}</h3>
+            <div className="space-y-4">
+                {Object.keys(section).map(key => {
+                    // Campos não editáveis
+                    if (['id', 'type', 'name', 'features', 'tabs', 'backgroundColor', 'textColor'].includes(key)) return null;
+
+                    // Campos de CTA (botões)
+                    if (key === 'cta' || key === 'secondary_cta') {
+                        if (!editedSection[key]) return null;
+                        return (
+                            <div key={key} className="p-4 border rounded-md space-y-3">
+                                <h4 className="font-semibold text-lg capitalize">{key.replace('_', ' ')}</h4>
+                                <FormInput label="Texto do Botão" value={editedSection[key].text} onChange={e => handleCtaChange(key, 'text', e.target.value)} />
+                                <FormInput label="Link do Botão" value={editedSection[key].link} onChange={e => handleCtaChange(key, 'link', e.target.value)} />
+                            </div>
+                        );
+                    }
+                    
+                    // Campos de Mídia
+                    if (key === 'backgroundVideoUrl' || key === 'backgroundImageUrl') {
+                         return <FormInput key={key} label="URL da Mídia de Fundo (Vídeo/Imagem)" value={editedSection[key] || ''} onChange={e => handleInputChange(key, e.target.value)} />
+                    }
+
+                    // Campos de texto genéricos
+                    return <FormInput key={key} label={key.charAt(0).toUpperCase() + key.slice(1)} value={editedSection[key]} onChange={e => handleInputChange(key, e.target.value)} type={typeof editedSection[key] === 'string' && editedSection[key].length > 100 ? 'textarea' : 'text'}/>
+                })}
+
+                {/* Editor para a seção de abas (tabs) */}
+                {section.type === 'tabs' && (
+                    <div className="space-y-6">
+                        <h4 className="font-semibold text-lg mt-6 mb-2">Abas dos Pontos Críticos</h4>
+                        {editedSection.tabs.map((tab, index) => (
+                            <div key={tab.id} className="p-4 border rounded-md space-y-3">
+                                <h5 className="font-bold">{tab.name}</h5>
+                                <FormInput label="Título" value={tab.title} onChange={e => handleTabChange(index, 'title', e.target.value)} />
+                                <FormInput label="Conteúdo" value={tab.content} onChange={e => handleTabChange(index, 'content', e.target.value)} type="textarea" />
+                                <FormInput label="Prejuízo" value={tab.loss} onChange={e => handleTabChange(index, 'loss', e.target.value)} />
+                                <FormInput label="URL da Imagem" value={tab.imageUrl} onChange={e => handleTabChange(index, 'imageUrl', e.target.value)} />
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+            <div className="mt-8 flex justify-end space-x-4">
+                <button onClick={onCancel} className="px-6 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300 disabled:opacity-50" disabled={isSaving}>Cancelar</button>
+                <button onClick={handleSaveClick} className="px-6 py-2 bg-yellow-500 text-black font-bold rounded-md hover:bg-yellow-600 disabled:opacity-50" disabled={isSaving}>
+                    {isSaving ? 'Salvando...' : 'Salvar Alterações'}
+                </button>
+            </div>
+        </div>
+    );
+};
+
+
+// --- Componente do Dashboard ---
+const Dashboard = ({ onLogout }) => {
+    const [sections, setSections] = useState([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [selectedSection, setSelectedSection] = useState(null);
+    const [showNotification, setShowNotification] = useState('');
+    const [error, setError] = useState('');
+
+    useEffect(() => {
+        const fetchSections = async () => {
+            try {
+                const querySnapshot = await getDocs(collection(db, "siteContent"));
+                const sectionsArray = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+                const order = ['home', 'prejuizo', 'solucao', 'pontos-criticos', 'contato'];
+                const orderedSections = sectionsArray.sort((a, b) => order.indexOf(a.id) - order.indexOf(b.id));
+                setSections(orderedSections);
+            } catch (err) {
+                console.error("Erro ao buscar seções:", err);
+                setError("Não foi possível carregar os dados do site. Verifique sua conexão e as configurações do Firebase.");
+            } finally {
+                setIsLoading(false);
+            }
+        };
+        fetchSections();
+    }, []);
+
+    const handleSave = async (updatedSection) => {
+        try {
+            const sectionRef = doc(db, "siteContent", updatedSection.id);
+            await setDoc(sectionRef, updatedSection, { merge: true });
+            
+            setSections(prev => prev.map(s => s.id === updatedSection.id ? updatedSection : s));
+            setSelectedSection(null);
+            
+            setShowNotification('Seção salva com sucesso!');
+            setTimeout(() => setShowNotification(''), 3000);
+        } catch (err) {
+            console.error("Erro ao salvar seção:", err);
+            setError("Falha ao salvar. Verifique o console para mais detalhes.");
+        }
+    };
+
+    if (isLoading) {
+        return <div className="flex justify-center items-center h-screen font-bold text-xl">Carregando Painel...</div>;
+    }
+
+    return (
+        <div className="min-h-screen bg-gray-100">
+            <header className="bg-white shadow">
+                <div className="container mx-auto px-6 py-4 flex justify-between items-center">
+                    <h1 className="text-2xl font-bold text-gray-800">Painel Marruá</h1>
+                    <button onClick={onLogout} className="font-semibold text-gray-600 hover:text-yellow-600">Sair</button>
+                </div>
+            </header>
+            <main className="container mx-auto px-6 py-8">
+                {error && <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4" role="alert">{error}</div>}
+                {selectedSection ? (
+                    <SectionEditor section={selectedSection} onSave={handleSave} onCancel={() => setSelectedSection(null)} />
+                ) : (
+                    <div>
+                        <h2 className="text-3xl font-bold text-gray-800 mb-6">Gerenciar Seções do Site</h2>
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                            {sections.map(section => (
+                                <div key={section.id} className="bg-white p-6 rounded-lg shadow-md flex flex-col justify-between">
+                                    <div>
+                                        <h3 className="font-bold text-xl text-gray-800">{section.name}</h3>
+                                        <p className="text-gray-500 text-sm mt-1">ID: {section.id}</p>
+                                    </div>
+                                    <button onClick={() => setSelectedSection(section)} className="mt-4 w-full bg-gray-800 text-white font-bold py-2 px-4 rounded-md hover:bg-black transition-colors">
+                                        Editar
+                                    </button>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+            </main>
+            {showNotification && (
+                <div className="fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg animate-fade-in-up">
+                    {showNotification}
+                </div>
+            )}
+        </div>
+    );
+};
+
+// --- Componente de Login ---
+const LoginScreen = ({ onLoginSuccess }) => {
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+
+    const handleLogin = async (e) => {
+        e.preventDefault();
+        setError('');
+        setIsLoading(true);
+        try {
+            await signInWithEmailAndPassword(auth, email, password);
+            onLoginSuccess();
+        } catch (err) {
+            setError('Credenciais inválidas ou erro de conexão.');
+            console.error(err);
+        } finally {
+            setIsLoading(false);
+        }
+    };
+
+    return (
+        <div className="min-h-screen flex items-center justify-center bg-gray-800">
+            <div className="bg-white p-8 rounded-lg shadow-2xl w-full max-w-md">
+                <h1 className="text-3xl font-bold text-center text-gray-800 mb-2">Painel Marruá</h1>
+                <p className="text-center text-gray-500 mb-8">Acesso Administrativo</p>
+                <form onSubmit={handleLogin} className="space-y-6">
+                    <FormInput label="Email" value={email} onChange={e => setEmail(e.target.value)} placeholder="seu@email.com" type="email" />
+                    <FormInput label="Senha" value={password} onChange={e => setPassword(e.target.value)} placeholder="********" type="password" />
+                    {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+                    <div>
+                        <button type="submit" className="w-full bg-yellow-500 text-black font-bold py-3 px-4 rounded-md hover:bg-yellow-600 transition-colors text-lg disabled:opacity-50" disabled={isLoading}>
+                            {isLoading ? 'Entrando...' : 'Entrar'}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    );
+};
+
+
+// --- Componente Principal da Aplicação ---
+export default function App() {
+    const [user, setUser] = useState(null);
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            setUser(user);
+            setIsLoading(false);
+        });
+        return () => unsubscribe();
+    }, []);
+    
+    const handleLogout = async () => {
+        await signOut(auth);
+    };
+
+    if (isLoading) {
+        return <div className="flex justify-center items-center h-screen font-bold text-xl">Verificando autenticação...</div>
+    }
+
+    return (
+         <div className="font-sans">
+             <style jsx global>{`
+                @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap');
+                body { font-family: 'Inter', sans-serif; }
+                h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+                @keyframes fadeInUp {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+                .animate-fade-in-up {
+                    animation: fadeInUp 0.5s ease-out forwards;
+                }
+            `}</style>
+            {user ? <Dashboard onLogout={handleLogout} /> : <LoginScreen onLoginSuccess={() => {}} />}
+        </div>
+    );
+}
