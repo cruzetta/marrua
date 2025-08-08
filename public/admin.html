@@ -11,7 +11,6 @@
     <style>
         body { font-family: 'Inter', sans-serif; }
         h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
-        /* Estilo para o item do menu ativo */
         .admin-nav-link.active {
             background-color: #f59e0b; /* bg-amber-500 */
             color: black;
@@ -73,7 +72,6 @@
         import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore.js";
 
         const firebaseConfig = {
-          // Sua configuração do Firebase permanece aqui
           apiKey: "AIzaSyCP_QD2ekfd1qif82Eg02eKg6Xuqnsfl80",
           authDomain: "marrua-consultoria.firebaseapp.com",
           projectId: "marrua-consultoria",
@@ -101,13 +99,14 @@
                 subtitle: 'A Marruá Consultoria garante que cada grama do seu investimento seja valorizada no frigorífico. Atuamos onde o seu trabalho é mais vulnerável.',
                 backgroundVideoUrl: 'https://firebasestorage.googleapis.com/v0/b/platamais.firebasestorage.app/o/saude%20kangen%20brasil%2FV%C3%ADdeo%20sem%20t%C3%ADtulo.mp4?alt=media&token=78e9f776-133d-4e18-be82-556a4700bd5d',
                 cta: { text: 'Calcular meu prejuízo', link: '#prejuizo' },
-                secondary_cta: { text: 'Fale com um especialista', link: 'https://wa.me/5567992196499' }
+                secondary_cta: { text: 'Fale com um especialista', link: 'https://wa.me/5567992196499?text=Ol%C3%A1%2C%20vim%20do%20site%20e%20gostaria%20de%20mais%20informa%C3%A7%C3%B5es.' }
             },
             prejuizo: {
                 name: "Calculadora de Prejuízo",
                 icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm10 10a1 1 0 10-2 0v2a1 1 0 102 0v-2zm-4 0a1 1 0 10-2 0v2a1 1 0 102 0v-2zm-4-4a1 1 0 10-2 0v2a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v2a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v2a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>`,
                 title: 'Você está deixando dinheiro no frigorífico.',
-                subtitle: 'Meses de investimento em genética, nutrição e sanidade podem ser perdidos em poucas horas por falhas no processo de abate. Calcule seu prejuízo potencial e veja o quanto seu lucro está em risco.'
+                subtitle: 'Meses de investimento em genética, nutrição e sanidade podem ser perdidos em poucas horas por falhas no processo de abate. Calcule seu prejuízo potencial e veja o quanto seu lucro está em risco.',
+                defaultArrobaValue: 315
             },
             solucao: {
                 name: "Nossa Atuação",
@@ -127,15 +126,15 @@
                 title: 'Os 9 Pontos Críticos Onde Seu Lucro Desaparece',
                 subtitle: 'Pequenos erros operacionais, somados, geram um grande prejuízo. Nossa equipe técnica monitora e corrige ativamente estas falhas. Conheça cada ponto:',
                 tabs: [
-                    { id: 'esfola', name: 'Esfola', title: '1. Esfola do Quarto/Matambre', content: 'A remoção do couro deve ser precisa. Erros comuns podem retirar parte do matambre junto, impactando diretamente o peso da carcaça.', loss: '300g a 800g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Esfola' },
-                    { id: 'reata', name: 'Reata', title: '2. Reata', content: 'O couro deve ser baixado até o cupim; caso contrário, haverá remoção de gordura aderida, reduzindo o rendimento da carcaça.', loss: '200g a 600g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Reata' },
-                    { id: 'sangria', name: 'Sangria', title: '3. Sangria', content: 'A remoção da sangria deve ser precisa. Retirar carne em excesso nesta área é um erro comum que impacta o peso final.', loss: '200g a 500g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Sangria' },
-                    { id: 'ligamento', name: 'Ligamento', title: '4. Ligamento Cervical', content: 'A retirada do ligamento deve ser "limpa". Remover carne junto é um desperdício que afeta o aproveitamento da carcaça.', loss: '300g a 700g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Ligamento' },
-                    { id: 'abscesso', name: 'Abscesso', title: '5. Abscesso Vacinal', content: 'A remoção do abscesso é obrigatória, mas deve ser precisa. Retirar carne em excesso ao redor é um prejuízo direto.', loss: '200g a 800g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Abscesso' },
-                    { id: 'contaminacao', name: 'Contaminação', title: '6. D.I.F - Contaminação', content: 'O estouro do rúmen pode contaminar a carcaça. Sem acompanhamento, pode haver retirada de quilos de carne sem a correspondente compensação.', loss: 'Mínimo de 3kg', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Contaminação' },
-                    { id: 'queda', name: 'Queda', title: '7. D.I.F - Queda da Carcaça', content: 'Uma carcaça que cai do gancho é contaminada. A limpeza no D.I.F. pode resultar em grandes perdas de carne se não for acompanhada de perto.', loss: 'Mínimo de 5kg', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Queda' },
-                    { id: 'doenca', name: 'Doença', title: '8. D.I.F - Desvio por Doença', content: 'Quando uma carcaça é desviada, acompanhamos a avaliação do veterinário, documentando o processo para garantir que apenas o necessário seja descartado.', loss: 'Variável, até 100%', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Doença' },
-                    { id: 'bezerros', name: 'Bezerros', title: '9. Bezerros em Abate', content: 'A inclusão indevida de bezerros no romaneio gera cobranças erradas no pagamento final, um prejuízo oculto e significativo.', loss: 'Até R$600/bezerro', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Bezerros' },
+                    { id: 'esfola', name: 'Esfola', title: '1. Esfola do Quarto/Matambre', content: 'A remoção do couro deve ser precisa. Erros comuns podem retirar parte do matambre junto, impactando diretamente o peso da carcaça.', loss: '300g a 800g', imageUrl: 'imagens/esfola.jpg' },
+                    { id: 'reata', name: 'Reata', title: '2. Reata', content: 'O couro deve ser baixado até o cupim; caso contrário, haverá remoção de gordura aderida, reduzindo o rendimento da carcaça.', loss: '200g a 600g', imageUrl: 'imagens/reata.jpg' },
+                    { id: 'sangria', name: 'Sangria', title: '3. Sangria', content: 'A remoção da sangria deve ser precisa. Retirar carne em excesso nesta área é um erro comum que impacta o peso final.', loss: '200g a 500g', imageUrl: 'imagens/sangria.jpg' },
+                    { id: 'ligamento', name: 'Ligamento', title: '4. Ligamento Cervical', content: 'A retirada do ligamento deve ser "limpa". Remover carne junto é um desperdício que afeta o aproveitamento da carcaça.', loss: '300g a 700g', imageUrl: 'imagens/ligamento.jpg' },
+                    { id: 'abscesso', name: 'Abscesso', title: '5. Abscesso Vacinal', content: 'A remoção do abscesso é obrigatória, mas deve ser precisa. Retirar carne em excesso ao redor é um prejuízo direto.', loss: '200g a 800g', imageUrl: 'imagens/abscesso.jpg' },
+                    { id: 'contaminacao', name: 'Contaminação', title: '6. D.I.F - Contaminação', content: 'O estouro do rúmen pode contaminar a carcaça. Sem acompanhamento, pode haver retirada de quilos de carne sem a correspondente compensação.', loss: 'Mínimo de 3kg', imageUrl: 'imagens/contaminacao.jpg' },
+                    { id: 'queda', name: 'Queda', title: '7. D.I.F - Queda da Carcaça', content: 'Uma carcaça que cai do gancho é contaminada. A limpeza no D.I.F. pode resultar em grandes perdas de carne se não for acompanhada de perto.', loss: 'Mínimo de 5kg', imageUrl: 'imagens/queda.jpg' },
+                    { id: 'doenca', name: 'Doença', title: '8. D.I.F - Desvio por Doença', content: 'Quando uma carcaça é desviada, acompanhamos a avaliação do veterinário, documentando o processo para garantir que apenas o necessário seja descartado.', loss: 'Variável, até 100%', imageUrl: 'imagens/doenca.jpg' },
+                    { id: 'bezerros', name: 'Bezerros', title: '9. Bezerros em Abate', content: 'A inclusão indevida de bezerros no romaneio gera cobranças erradas no pagamento final, um prejuízo oculto e significativo.', loss: 'Até R$600/bezerro', imageUrl: 'imagens/bezerros.jpg' },
                 ]
             },
             contato: {
@@ -181,26 +180,28 @@
             dashboardLayout.innerHTML = `<p class="text-center p-10">A carregar conteúdo...</p>`;
             try {
                 const querySnapshot = await getDocs(collection(db, "siteContent"));
-                if (querySnapshot.empty) {
-                    console.warn("A coleção 'siteContent' está vazia. A usar dados de fallback.");
-                    siteSections = JSON.parse(JSON.stringify(fallbackData)); 
-                    for (const key in siteSections) {
-                        siteSections[key].id = key;
+                const firebaseSections = {};
+                querySnapshot.forEach(doc => {
+                    firebaseSections[doc.id] = { id: doc.id, ...doc.data() };
+                });
+
+                // Mescla os dados do Firebase com os de fallback
+                siteSections = {
+                    ...fallbackData,
+                    ...firebaseSections
+                };
+
+                for(const key in siteSections) {
+                    if(fallbackData[key] && firebaseSections[key]) {
+                        siteSections[key] = {...fallbackData[key], ...firebaseSections[key]};
                     }
-                } else {
-                    siteSections = {};
-                    querySnapshot.forEach(doc => {
-                        siteSections[doc.id] = { id: doc.id, ...doc.data() };
-                    });
                 }
+
                 renderAdminLayout();
             } catch (error) {
                 dashboardLayout.innerHTML = `<p class="text-red-500 text-center p-10">Erro ao carregar conteúdo: ${error.message}</p>`;
                 console.error("Erro ao carregar do Firebase, a usar dados de fallback.", error);
-                siteSections = JSON.parse(JSON.stringify(fallbackData)); 
-                for (const key in siteSections) {
-                    siteSections[key].id = key;
-                }
+                siteSections = JSON.parse(JSON.stringify(fallbackData));
                 renderAdminLayout();
             }
         }
@@ -215,7 +216,7 @@
                             <h3 class="font-bold text-lg mb-4 px-2">Gerir Conteúdo</h3>
                             <nav id="admin-sidebar" class="space-y-1">
                                 ${order.map(id => {
-                                    const section = siteSections[id] || fallbackData[id];
+                                    const section = siteSections[id];
                                     if (!section) return '';
                                     return `<a href="#" data-section-id="${id}" class="admin-nav-link flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-200 transition-colors">
                                                 ${section.icon || ''}
@@ -281,15 +282,23 @@
 
         function renderFormInputs(section) {
             let inputs = '';
-            const fieldOrder = ['title', 'subtitle', 'backgroundVideoUrl', 'backgroundImageUrl', 'cta', 'secondary_cta', 'tabs'];
+            const fieldOrder = ['title', 'subtitle', 'defaultArrobaValue', 'backgroundVideoUrl', 'backgroundImageUrl', 'cta', 'secondary_cta', 'tabs'];
             const processedKeys = new Set(['id', 'type', 'name', 'icon', 'features']);
 
-            const allKeys = [...fieldOrder, ...Object.keys(section).filter(k => !fieldOrder.includes(k) && !processedKeys.has(k))];
+            const allKeys = [...new Set([...fieldOrder, ...Object.keys(section)])].filter(k => !processedKeys.has(k));
 
             for (const key of allKeys) {
-                if (key === 'tabs' && Array.isArray(section.tabs)) {
+                const value = section[key];
+
+                if (key === 'defaultArrobaValue') {
+                    inputs += `
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700">Valor Padrão da Arroba (@)</label>
+                            <input type="number" data-key="defaultArrobaValue" class="section-input w-full p-2 border rounded-md" value="${value || '315'}">
+                        </div>`;
+                } else if (key === 'tabs' && Array.isArray(value)) {
                     inputs += `<h4 class="font-semibold text-lg mt-6 mb-2 border-t pt-4">Abas dos Pontos Críticos</h4>`;
-                    inputs += section.tabs.map((tab, index) => `
+                    inputs += value.map((tab, index) => `
                         <div class="p-4 border rounded-md space-y-3 bg-gray-50">
                             <h5 class="font-bold">${tab.name} (Aba ${index + 1})</h5>
                             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -312,22 +321,22 @@
                             </div>
                         </div>
                     `).join('');
-                } else if (typeof section[key] === 'object' && section[key] !== null) {
+                } else if (typeof value === 'object' && value !== null) {
                     inputs += `<h4 class="font-semibold text-lg mt-4 capitalize border-t pt-4">${key.replace(/_/g, ' ')}</h4>`;
-                    for (const subKey in section[key]) {
+                    for (const subKey in value) {
                         inputs += `
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 capitalize">${subKey}</label>
-                                <input data-key="${key}.${subKey}" class="section-input w-full p-2 border rounded-md" value="${section[key][subKey] || ''}">
+                                <input data-key="${key}.${subKey}" class="section-input w-full p-2 border rounded-md" value="${value[subKey] || ''}">
                             </div>
                         `;
                     }
-                } else {
+                } else if (typeof value === 'string' || typeof value === 'number') {
                      const label = key.replace(/([A-Z])/g, ' $1').replace('Url', ' URL').replace(/_/g, ' ');
                      inputs += `
                         <div>
                             <label class="block text-sm font-medium text-gray-700 capitalize">${label}</label>
-                            <textarea data-key="${key}" class="section-input w-full p-2 border rounded-md" rows="3">${section[key] || ''}</textarea>
+                            <textarea data-key="${key}" class="section-input w-full p-2 border rounded-md" rows="3">${value || ''}</textarea>
                         </div>
                     `;
                 }
@@ -341,23 +350,22 @@
             const button = e.target;
             const sectionId = button.dataset.id;
             const editorDiv = document.getElementById(`editor-${sectionId}`);
-            const originalSection = siteSections[sectionId];
             const updatedSectionData = {}; 
 
             editorDiv.querySelectorAll('.section-input').forEach(input => {
                 const keys = input.dataset.key.split('.');
+                let value = input.type === 'number' ? parseFloat(input.value) : input.value;
+
                 if (keys.length > 1) {
-                    if (!updatedSectionData[keys[0]]) {
-                        updatedSectionData[keys[0]] = {};
-                    }
-                    updatedSectionData[keys[0]][keys[1]] = input.value;
+                    if (!updatedSectionData[keys[0]]) updatedSectionData[keys[0]] = {};
+                    updatedSectionData[keys[0]][keys[1]] = value;
                 } else {
-                    updatedSectionData[keys[0]] = input.value;
+                    updatedSectionData[keys[0]] = value;
                 }
             });
 
-            if (originalSection.tabs) {
-                const updatedTabs = JSON.parse(JSON.stringify(originalSection.tabs));
+            if (siteSections[sectionId] && siteSections[sectionId].tabs) {
+                const updatedTabs = JSON.parse(JSON.stringify(siteSections[sectionId].tabs));
                 editorDiv.querySelectorAll('.tab-input').forEach(input => {
                     const index = input.dataset.index;
                     const key = input.dataset.key;
@@ -371,14 +379,9 @@
                 button.disabled = true;
                 const sectionRef = doc(db, "siteContent", sectionId);
 
-                // --- CORREÇÃO APLICADA AQUI ---
-                // Usamos { merge: true } para garantir que os campos não editados 
-                // (como 'name', 'icon', 'features') não sejam apagados do Firestore.
                 await setDoc(sectionRef, updatedSectionData, { merge: true });
                 
-                // Atualiza os dados locais com os que foram salvos
-                // É importante mesclar os dados aqui também para manter o estado local consistente
-                siteSections[sectionId] = { ...originalSection, ...updatedSectionData };
+                siteSections[sectionId] = { ...siteSections[sectionId], ...updatedSectionData };
                 
                 showNotification();
             } catch (error) {
