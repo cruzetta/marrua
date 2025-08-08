@@ -132,7 +132,7 @@
                     <div id="tab-buttons" class="mb-6 overflow-x-auto pb-2 no-scrollbar flex space-x-1 md:space-x-2 border-b border-gray-600 w-max mx-auto">
                         <!-- Botões das abas serão inseridos aqui -->
                     </div>
-                    <div id="tab-content" class="bg-gray-900 p-6 md:p-8 rounded-lg shadow-inner border border-gray-700 min-h-[420px] flex items-center">
+                    <div id="tab-content" class="bg-gray-900 p-6 md:p-8 rounded-lg shadow-inner border border-gray-700 min-h-[450px] flex items-center">
                         <p>Selecione um ponto crítico para ver os detalhes.</p>
                     </div>
                 </div>
@@ -212,15 +212,15 @@
                 title: 'Os 9 Pontos Críticos Onde Seu Lucro Desaparece',
                 subtitle: 'Pequenos erros operacionais, somados, geram um grande prejuízo. Nossa equipe técnica monitora e corrige ativamente estas falhas. Conheça cada ponto:',
                 tabs: [
-                    { id: 'esfola', name: 'Esfola', title: '1. Esfola do Quarto/Matambre', content: 'A remoção do couro deve ser precisa. Erros comuns podem retirar parte do matambre junto, impactando diretamente o peso da carcaça.', loss: '300g a 800g', imageUrl: 'imagens/esfola.jpg' },
-                    { id: 'reata', name: 'Reata', title: '2. Reata', content: 'O couro deve ser baixado até o cupim; caso contrário, haverá remoção de gordura aderida, reduzindo o rendimento da carcaça.', loss: '200g a 600g', imageUrl: 'imagens/reata.jpg' },
-                    { id: 'sangria', name: 'Sangria', title: '3. Sangria', content: 'A remoção da sangria deve ser precisa. Retirar carne em excesso nesta área é um erro comum que impacta o peso final.', loss: '200g a 500g', imageUrl: 'imagens/sangria.jpg' },
-                    { id: 'ligamento', name: 'Ligamento', title: '4. Ligamento Cervical', content: 'A retirada do ligamento deve ser "limpa". Remover carne junto é um desperdício que afeta o aproveitamento da carcaça.', loss: '300g a 700g', imageUrl: 'imagens/ligamento.jpg' },
-                    { id: 'abscesso', name: 'Abscesso', title: '5. Abscesso Vacinal', content: 'A remoção do abscesso é obrigatória, mas deve ser precisa. Retirar carne em excesso ao redor é um prejuízo direto.', loss: '200g a 800g', imageUrl: 'imagens/abscesso.jpg' },
-                    { id: 'contaminacao', name: 'Contaminação', title: '6. D.I.F - Contaminação', content: 'O estouro do rúmen pode contaminar a carcaça. Sem acompanhamento, pode haver retirada de quilos de carne sem a correspondente compensação.', loss: 'Mínimo de 3kg', imageUrl: 'imagens/contaminacao.jpg' },
-                    { id: 'queda', name: 'Queda', title: '7. D.I.F - Queda da Carcaça', content: 'Uma carcaça que cai do gancho é contaminada. A limpeza no D.I.F. pode resultar em grandes perdas de carne se não for acompanhada de perto.', loss: 'Mínimo de 5kg', imageUrl: 'imagens/queda.jpg' },
-                    { id: 'doenca', name: 'Doença', title: '8. D.I.F - Desvio por Doença', content: 'Quando uma carcaça é desviada, acompanhamos a avaliação do veterinário, documentando o processo para garantir que apenas o necessário seja descartado.', loss: 'Variável, até 100%', imageUrl: 'imagens/doenca.jpg' },
-                    { id: 'bezerros', name: 'Bezerros', title: '9. Bezerros em Abate', content: 'A inclusão indevida de bezerros no romaneio gera cobranças erradas no pagamento final, um prejuízo oculto e significativo.', loss: 'Até R$600/bezerro', imageUrl: 'imagens/bezerros.jpg' },
+                    { id: 'esfola', name: 'Esfola', title: '1. Esfola do Quarto/Matambre', content: 'A remoção do couro deve ser precisa. Erros comuns podem retirar parte do matambre junto, impactando diretamente o peso da carcaça.', loss: '300g a 800g', imageUrlErrado: 'https://placehold.co/600x400/ef4444/ffffff?text=Errado', imageUrlCerto: 'https://placehold.co/600x400/22c55e/ffffff?text=Certo' },
+                    { id: 'reata', name: 'Reata', title: '2. Reata', content: 'O couro deve ser baixado até o cupim; caso contrário, haverá remoção de gordura aderida, reduzindo o rendimento da carcaça.', loss: '200g a 600g', imageUrlErrado: 'https://placehold.co/600x400/ef4444/ffffff?text=Errado', imageUrlCerto: 'https://placehold.co/600x400/22c55e/ffffff?text=Certo' },
+                    { id: 'sangria', name: 'Sangria', title: '3. Sangria', content: 'A remoção da sangria deve ser precisa. Retirar carne em excesso nesta área é um erro comum que impacta o peso final.', loss: '200g a 500g', imageUrlErrado: 'https://placehold.co/600x400/ef4444/ffffff?text=Errado', imageUrlCerto: 'https://placehold.co/600x400/22c55e/ffffff?text=Certo' },
+                    { id: 'ligamento', name: 'Ligamento', title: '4. Ligamento Cervical', content: 'A retirada do ligamento deve ser "limpa". Remover carne junto é um desperdício que afeta o aproveitamento da carcaça.', loss: '300g a 700g', imageUrlErrado: 'https://placehold.co/600x400/ef4444/ffffff?text=Errado', imageUrlCerto: 'https://placehold.co/600x400/22c55e/ffffff?text=Certo' },
+                    { id: 'abscesso', name: 'Abscesso', title: '5. Abscesso Vacinal', content: 'A remoção do abscesso é obrigatória, mas deve ser precisa. Retirar carne em excesso ao redor é um prejuízo direto.', loss: '200g a 800g', imageUrlErrado: 'https://placehold.co/600x400/ef4444/ffffff?text=Errado', imageUrlCerto: 'https://placehold.co/600x400/22c55e/ffffff?text=Certo' },
+                    { id: 'contaminacao', name: 'Contaminação', title: '6. D.I.F - Contaminação', content: 'O estouro do rúmen pode contaminar a carcaça. Sem acompanhamento, pode haver retirada de quilos de carne sem a correspondente compensação.', loss: 'Mínimo de 3kg', imageUrlErrado: 'https://placehold.co/600x400/ef4444/ffffff?text=Contamina%C3%A7%C3%A3o', imageUrlCerto: 'https://placehold.co/600x400/22c55e/ffffff?text=Ideal' },
+                    { id: 'queda', name: 'Queda', title: '7. D.I.F - Queda da Carcaça', content: 'Uma carcaça que cai do gancho é contaminada. A limpeza no D.I.F. pode resultar em grandes perdas de carne se não for acompanhada de perto.', loss: 'Mínimo de 5kg', imageUrlErrado: 'https://placehold.co/600x400/ef4444/ffffff?text=Queda', imageUrlCerto: 'https://placehold.co/600x400/22c55e/ffffff?text=Ideal' },
+                    { id: 'doenca', name: 'Doença', title: '8. D.I.F - Desvio por Doença', content: 'Quando uma carcaça é desviada, acompanhamos a avaliação do veterinário, documentando o processo para garantir que apenas o necessário seja descartado.', loss: 'Variável, até 100%', imageUrlErrado: 'https://placehold.co/600x400/ef4444/ffffff?text=Doen%C3%A7a', imageUrlCerto: 'https://placehold.co/600x400/22c55e/ffffff?text=Ideal' },
+                    { id: 'bezerros', name: 'Bezerros', title: '9. Bezerros em Abate', content: 'A inclusão indevida de bezerros no romaneio gera cobranças erradas no pagamento final, um prejuízo oculto e significativo.', loss: 'Até R$600/bezerro', imageUrlErrado: 'https://placehold.co/600x400/ef4444/ffffff?text=Incorreto', imageUrlCerto: 'https://placehold.co/600x400/22c55e/ffffff?text=Correto' },
                 ]
             },
             contato: {
@@ -286,6 +286,8 @@
                 document.getElementById('pontos-criticos-title').innerText = pontosCriticos.title;
                 document.getElementById('pontos-criticos-subtitle').innerText = pontosCriticos.subtitle;
                 const tabButtonsContainer = document.getElementById('tab-buttons');
+                const tabContentContainer = document.getElementById('tab-content');
+                
                 tabButtonsContainer.innerHTML = pontosCriticos.tabs.map(tab => `
                     <button data-tab="${tab.id}" class="tab-button flex-shrink-0 text-sm md:text-base font-semibold p-3 md:p-4 border-b-2 transition-colors duration-200 border-transparent text-gray-400 hover:text-white">
                         ${tab.name}
@@ -293,22 +295,32 @@
                 `).join('');
                 
                 const tabButtons = document.querySelectorAll('.tab-button');
-                const tabContentContainer = document.getElementById('tab-content');
 
                 function updateTabContent(tabId) {
                     const tabData = pontosCriticos.tabs.find(t => t.id === tabId);
                     if (tabData) {
                          tabContentContainer.innerHTML = `
                             <div class="grid md:grid-cols-2 gap-8 items-center w-full">
-                                <div>
+                                <div class="text-center md:text-left">
                                     <h3 class="text-2xl font-bold text-yellow-500 mb-3">${tabData.title}</h3>
                                     <p class="text-gray-300 mb-4">${tabData.content}</p>
-                                    <div class="bg-red-900/50 border border-red-700 p-4 rounded-lg mt-4">
+                                    <div class="bg-red-900/50 border border-red-700 p-4 rounded-lg mt-4 inline-block">
                                         <p class="font-semibold text-red-300">Prejuízo Potencial: <span class="text-xl font-bold text-white">${tabData.loss}</span></p>
                                     </div>
                                 </div>
-                                <div class="mt-4 md:mt-0">
-                                    <img src="${tabData.imageUrl}" alt="Exemplo de ${tabData.name}" class="rounded-lg shadow-md w-full max-w-md mx-auto"/>
+                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 items-start">
+                                    <div>
+                                        <div class="bg-red-500/10 border-2 border-red-500 rounded-lg p-2">
+                                            <img src="${tabData.imageUrlErrado}" alt="Procedimento errado para ${tabData.name}" class="rounded-md w-full h-auto object-cover aspect-square" onerror="this.src='https://placehold.co/400x400/ef4444/ffffff?text=Imagem+N%C3%A3o+Encontrada'"/>
+                                            <h4 class="font-bold text-center mt-2 text-red-400">PROCEDIMENTO ERRADO</h4>
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <div class="bg-green-500/10 border-2 border-green-500 rounded-lg p-2">
+                                            <img src="${tabData.imageUrlCerto}" alt="Procedimento certo para ${tabData.name}" class="rounded-md w-full h-auto object-cover aspect-square" onerror="this.src='https://placehold.co/400x400/22c55e/ffffff?text=Imagem+N%C3%A3o+Encontrada'"/>
+                                            <h4 class="font-bold text-center mt-2 text-green-400">PROCEDIMENTO CORRETO</h4>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>`;
                     }
@@ -323,8 +335,7 @@
                 });
 
                 if (tabButtons.length > 0) {
-                    tabButtons[0].classList.add('active');
-                    updateTabContent(tabButtons[0].dataset.tab);
+                    tabButtons[0].click();
                 }
             }
 
@@ -332,7 +343,7 @@
             const contato = sections.contato;
             if (contato) {
                 const contatoSection = document.getElementById('contato');
-                if(contato.backgroundImageUrl) contatoSection.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${contato.backgroundImageUrl})`;
+                if(contato.backgroundImageUrl) contatoSection.style.backgroundImage = `url(${contato.backgroundImageUrl})`;
                 document.getElementById('contato-title').innerText = contato.title;
                 document.getElementById('contato-subtitle').innerText = contato.subtitle;
                 if(contato.cta) {
