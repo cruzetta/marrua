@@ -178,12 +178,16 @@
 
         // --- Lógica do Dashboard ---
         async function loadDashboard() {
-            dashboardLayout.innerHTML = `<p>A carregar conteúdo...</p>`;
+            dashboardLayout.innerHTML = `<p class="text-center p-10">A carregar conteúdo...</p>`;
             try {
                 const querySnapshot = await getDocs(collection(db, "siteContent"));
                 if (querySnapshot.empty) {
                     console.warn("A coleção 'siteContent' está vazia. A usar dados de fallback.");
-                    siteSections = fallbackData;
+                    // **FIX:** Process fallback data to add IDs
+                    siteSections = JSON.parse(JSON.stringify(fallbackData)); // Deep copy
+                    for (const key in siteSections) {
+                        siteSections[key].id = key;
+                    }
                 } else {
                     siteSections = {};
                     querySnapshot.forEach(doc => {
@@ -192,9 +196,13 @@
                 }
                 renderAdminLayout();
             } catch (error) {
-                dashboardLayout.innerHTML = `<p class="text-red-500">Erro ao carregar conteúdo: ${error.message}</p>`;
+                dashboardLayout.innerHTML = `<p class="text-red-500 text-center p-10">Erro ao carregar conteúdo: ${error.message}</p>`;
                 console.error("Erro ao carregar do Firebase, a usar dados de fallback.", error);
-                siteSections = fallbackData;
+                // **FIX:** Also process fallback data on error
+                siteSections = JSON.parse(JSON.stringify(fallbackData)); // Deep copy
+                for (const key in siteSections) {
+                    siteSections[key].id = key;
+                }
                 renderAdminLayout();
             }
         }
@@ -220,7 +228,9 @@
                         </div>
                     </aside>
                     <main id="admin-main-content" class="w-full">
-                        <!-- O editor da seção será renderizado aqui -->
+                        <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+                            <p class="text-gray-500">Selecione uma seção no menu ao lado para começar a editar.</p>
+                        </div>
                     </main>
                 </div>
             `;
@@ -244,7 +254,9 @@
             document.getElementById('admin-main-content').addEventListener('click', handleSaveClick);
 
             // Renderiza a primeira seção por padrão
-            sidebar.querySelector('.admin-nav-link').click();
+            if (sidebar.querySelector('.admin-nav-link')) {
+                sidebar.querySelector('.admin-nav-link').click();
+            }
         }
         
         function renderSectionInMain(sectionId) {
@@ -278,11 +290,9 @@
             const fieldOrder = ['title', 'subtitle', 'backgroundVideoUrl', 'backgroundImageUrl', 'cta', 'secondary_cta', 'tabs'];
             const processedKeys = new Set(['id', 'type', 'name', 'icon', 'features']);
 
-            const allKeys = [...fieldOrder, ...Object.keys(section).filter(k => !fieldOrder.includes(k))];
+            const allKeys = [...fieldOrder, ...Object.keys(section).filter(k => !fieldOrder.includes(k) && !processedKeys.has(k))];
 
             for (const key of allKeys) {
-                if (processedKeys.has(key)) continue;
-
                 if (key === 'tabs' && Array.isArray(section.tabs)) {
                     inputs += `<h4 class="font-semibold text-lg mt-6 mb-2 border-t pt-4">Abas dos Pontos Críticos</h4>`;
                     inputs += section.tabs.map((tab, index) => `
@@ -327,7 +337,6 @@
                         </div>
                     `;
                 }
-                processedKeys.add(key);
             }
             return inputs;
         }
@@ -338,39 +347,41 @@
             const button = e.target;
             const sectionId = button.dataset.id;
             const editorDiv = document.getElementById(`editor-${sectionId}`);
-            const updatedSection = JSON.parse(JSON.stringify(siteSections[sectionId])); // Deep copy
+            const originalSection = siteSections[sectionId];
+            const updatedSectionData = {}; 
 
+            // Coleta todos os dados do formulário
             editorDiv.querySelectorAll('.section-input').forEach(input => {
                 const keys = input.dataset.key.split('.');
                 if (keys.length > 1) {
-                    updatedSection[keys[0]][keys[1]] = input.value;
+                    if (!updatedSectionData[keys[0]]) {
+                        updatedSectionData[keys[0]] = {};
+                    }
+                    updatedSectionData[keys[0]][keys[1]] = input.value;
                 } else {
-                    updatedSection[keys[0]] = input.value;
+                    updatedSectionData[keys[0]] = input.value;
                 }
             });
 
-            if (updatedSection.tabs) {
+            if (originalSection.tabs) {
+                const updatedTabs = JSON.parse(JSON.stringify(originalSection.tabs));
                 editorDiv.querySelectorAll('.tab-input').forEach(input => {
                     const index = input.dataset.index;
                     const key = input.dataset.key;
-                    updatedSection.tabs[index][key] = input.value;
+                    updatedTabs[index][key] = input.value;
                 });
+                updatedSectionData.tabs = updatedTabs;
             }
             
             try {
                 button.innerText = "A salvar...";
                 button.disabled = true;
                 const sectionRef = doc(db, "siteContent", sectionId);
-                
-                // Remove campos que não devem ser salvos no documento
-                delete updatedSection.id; 
-                delete updatedSection.name; 
-                delete updatedSection.icon; 
 
-                await setDoc(sectionRef, updatedSection);
+                await setDoc(sectionRef, updatedSectionData);
                 
                 // Atualiza os dados locais com os que foram salvos
-                siteSections[sectionId] = { id: sectionId, name: siteSections[sectionId].name, icon: siteSections[sectionId].icon, ...updatedSection };
+                siteSections[sectionId] = { ...originalSection, ...updatedSectionData };
                 
                 showNotification();
             } catch (error) {
