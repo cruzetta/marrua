@@ -185,8 +185,7 @@
         const db = getFirestore(app);
 
         // --- DADOS INICIAIS (Fallback) ---
-        // Estes dados são usados se o Firebase não responder ou estiver vazio.
-        // Contém o conteúdo original do seu site.
+        // Estes dados são usados como base e se o Firebase falhar.
         const fallbackData = {
             home: {
                 title: 'Seu lucro não pode virar prejuízo no final da linha.',
@@ -213,15 +212,15 @@
                 title: 'Os 9 Pontos Críticos Onde Seu Lucro Desaparece',
                 subtitle: 'Pequenos erros operacionais, somados, geram um grande prejuízo. Nossa equipe técnica monitora e corrige ativamente estas falhas. Conheça cada ponto:',
                 tabs: [
-                    { id: 'esfola', name: 'Esfola', title: '1. Esfola do Quarto/Matambre', content: 'A remoção do couro deve ser precisa. Erros comuns podem retirar parte do matambre junto, impactando diretamente o peso da carcaça.', loss: '300g a 800g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Esfola' },
-                    { id: 'reata', name: 'Reata', title: '2. Reata', content: 'O couro deve ser baixado até o cupim; caso contrário, haverá remoção de gordura aderida, reduzindo o rendimento da carcaça.', loss: '200g a 600g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Reata' },
-                    { id: 'sangria', name: 'Sangria', title: '3. Sangria', content: 'A remoção da sangria deve ser precisa. Retirar carne em excesso nesta área é um erro comum que impacta o peso final.', loss: '200g a 500g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Sangria' },
-                    { id: 'ligamento', name: 'Ligamento', title: '4. Ligamento Cervical', content: 'A retirada do ligamento deve ser "limpa". Remover carne junto é um desperdício que afeta o aproveitamento da carcaça.', loss: '300g a 700g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Ligamento' },
-                    { id: 'abscesso', name: 'Abscesso', title: '5. Abscesso Vacinal', content: 'A remoção do abscesso é obrigatória, mas deve ser precisa. Retirar carne em excesso ao redor é um prejuízo direto.', loss: '200g a 800g', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Abscesso' },
-                    { id: 'contaminacao', name: 'Contaminação', title: '6. D.I.F - Contaminação', content: 'O estouro do rúmen pode contaminar a carcaça. Sem acompanhamento, pode haver retirada de quilos de carne sem a correspondente compensação.', loss: 'Mínimo de 3kg', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Contaminação' },
-                    { id: 'queda', name: 'Queda', title: '7. D.I.F - Queda da Carcaça', content: 'Uma carcaça que cai do gancho é contaminada. A limpeza no D.I.F. pode resultar em grandes perdas de carne se não for acompanhada de perto.', loss: 'Mínimo de 5kg', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Queda' },
-                    { id: 'doenca', name: 'Doença', title: '8. D.I.F - Desvio por Doença', content: 'Quando uma carcaça é desviada, acompanhamos a avaliação do veterinário, documentando o processo para garantir que apenas o necessário seja descartado.', loss: 'Variável, até 100%', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Doença' },
-                    { id: 'bezerros', name: 'Bezerros', title: '9. Bezerros em Abate', content: 'A inclusão indevida de bezerros no romaneio gera cobranças erradas no pagamento final, um prejuízo oculto e significativo.', loss: 'Até R$600/bezerro', imageUrl: 'https://placehold.co/500x350/374151/FFFFFF?text=Bezerros' },
+                    { id: 'esfola', name: 'Esfola', title: '1. Esfola do Quarto/Matambre', content: 'A remoção do couro deve ser precisa. Erros comuns podem retirar parte do matambre junto, impactando diretamente o peso da carcaça.', loss: '300g a 800g', imageUrl: 'imagens/esfola.jpg' },
+                    { id: 'reata', name: 'Reata', title: '2. Reata', content: 'O couro deve ser baixado até o cupim; caso contrário, haverá remoção de gordura aderida, reduzindo o rendimento da carcaça.', loss: '200g a 600g', imageUrl: 'imagens/reata.jpg' },
+                    { id: 'sangria', name: 'Sangria', title: '3. Sangria', content: 'A remoção da sangria deve ser precisa. Retirar carne em excesso nesta área é um erro comum que impacta o peso final.', loss: '200g a 500g', imageUrl: 'imagens/sangria.jpg' },
+                    { id: 'ligamento', name: 'Ligamento', title: '4. Ligamento Cervical', content: 'A retirada do ligamento deve ser "limpa". Remover carne junto é um desperdício que afeta o aproveitamento da carcaça.', loss: '300g a 700g', imageUrl: 'imagens/ligamento.jpg' },
+                    { id: 'abscesso', name: 'Abscesso', title: '5. Abscesso Vacinal', content: 'A remoção do abscesso é obrigatória, mas deve ser precisa. Retirar carne em excesso ao redor é um prejuízo direto.', loss: '200g a 800g', imageUrl: 'imagens/abscesso.jpg' },
+                    { id: 'contaminacao', name: 'Contaminação', title: '6. D.I.F - Contaminação', content: 'O estouro do rúmen pode contaminar a carcaça. Sem acompanhamento, pode haver retirada de quilos de carne sem a correspondente compensação.', loss: 'Mínimo de 3kg', imageUrl: 'imagens/contaminacao.jpg' },
+                    { id: 'queda', name: 'Queda', title: '7. D.I.F - Queda da Carcaça', content: 'Uma carcaça que cai do gancho é contaminada. A limpeza no D.I.F. pode resultar em grandes perdas de carne se não for acompanhada de perto.', loss: 'Mínimo de 5kg', imageUrl: 'imagens/queda.jpg' },
+                    { id: 'doenca', name: 'Doença', title: '8. D.I.F - Desvio por Doença', content: 'Quando uma carcaça é desviada, acompanhamos a avaliação do veterinário, documentando o processo para garantir que apenas o necessário seja descartado.', loss: 'Variável, até 100%', imageUrl: 'imagens/doenca.jpg' },
+                    { id: 'bezerros', name: 'Bezerros', title: '9. Bezerros em Abate', content: 'A inclusão indevida de bezerros no romaneio gera cobranças erradas no pagamento final, um prejuízo oculto e significativo.', loss: 'Até R$600/bezerro', imageUrl: 'imagens/bezerros.jpg' },
                 ]
             },
             contato: {
@@ -239,13 +238,17 @@
             if (home) {
                 document.getElementById('home-title').innerText = home.title;
                 document.getElementById('home-subtitle').innerText = home.subtitle;
-                document.getElementById('home-video').src = home.backgroundVideoUrl;
-                const cta1 = document.getElementById('home-cta');
-                cta1.innerText = home.cta.text;
-                cta1.href = home.cta.link;
-                const cta2 = document.getElementById('home-secondary-cta');
-                cta2.innerText = home.secondary_cta.text;
-                cta2.href = home.secondary_cta.link;
+                if(home.backgroundVideoUrl) document.getElementById('home-video').src = home.backgroundVideoUrl;
+                if(home.cta) {
+                    const cta1 = document.getElementById('home-cta');
+                    cta1.innerText = home.cta.text;
+                    cta1.href = home.cta.link;
+                }
+                if(home.secondary_cta) {
+                    const cta2 = document.getElementById('home-secondary-cta');
+                    cta2.innerText = home.secondary_cta.text;
+                    cta2.href = home.secondary_cta.link;
+                }
             }
 
             // --- Preencher Seção Calculadora (prejuizo) ---
@@ -257,7 +260,7 @@
 
             // --- Preencher Seção Solução (features) ---
             const solucao = sections.solucao;
-            if (solucao) {
+            if (solucao && solucao.features) {
                 document.getElementById('solucao-title').innerText = solucao.title;
                 document.getElementById('solucao-subtitle').innerText = solucao.subtitle;
                 const featuresContainer = document.getElementById('solucao-features');
@@ -265,7 +268,7 @@
                     <div data-aos>
                          <div class="bg-white p-8 rounded-xl shadow-md text-center h-full flex flex-col transition-transform duration-300 hover:-translate-y-2 border-t-4 border-yellow-500">
                              <div class="bg-yellow-500 text-white rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-6">
-                                 <!-- Ícone pode ser adicionado aqui se desejar -->
+                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                              </div>
                              <h3 class="text-xl font-bold text-gray-800 mb-2">${feature.title}</h3>
                              <p class="text-gray-600 flex-grow">${feature.description}</p>
@@ -276,7 +279,7 @@
             
             // --- Preencher Seção Pontos Críticos (tabs) ---
             const pontosCriticos = sections['pontos-criticos'];
-            if (pontosCriticos) {
+            if (pontosCriticos && pontosCriticos.tabs) {
                 document.getElementById('pontos-criticos-title').innerText = pontosCriticos.title;
                 document.getElementById('pontos-criticos-subtitle').innerText = pontosCriticos.subtitle;
                 const tabButtonsContainer = document.getElementById('tab-buttons');
@@ -326,33 +329,46 @@
             const contato = sections.contato;
             if (contato) {
                 const contatoSection = document.getElementById('contato');
-                contatoSection.style.backgroundImage = `linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url(${contato.backgroundImageUrl})`;
+                if(contato.backgroundImageUrl) contatoSection.style.backgroundImage = `url(${contato.backgroundImageUrl})`;
                 document.getElementById('contato-title').innerText = contato.title;
                 document.getElementById('contato-subtitle').innerText = contato.subtitle;
-                const ctaContato = document.getElementById('contato-cta');
-                ctaContato.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.61 15.35 3.48 16.84L2.06 22L7.31 20.58C8.75 21.38 10.36 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 9.27 20.92 6.8 19.21 4.9C17.5 3.01 14.94 2 12.04 2ZM9.15 6.88C8.94 6.88 8.74 6.88 8.53 7.29C8.33 7.7 7.68 8.31 7.68 9.44C7.68 10.57 8.56 11.64 8.71 11.82C8.85 12 10.65 14.82 13.43 16.01C15.67 16.97 16.2 16.76 16.63 16.71C17.06 16.66 18.01 16.1 18.21 15.5C18.41 14.9 18.41 14.39 18.31 14.29C18.21 14.19 18.01 14.1 17.71 13.95C17.41 13.8 16.2 13.22 15.95 13.12C15.7 13.02 15.5 12.97 15.3 13.27C15.1 13.57 14.63 14.1 14.48 14.25C14.33 14.4 14.18 14.45 13.88 14.3C13.58 14.15 12.67 13.84 11.59 12.87C10.72 12.09 10.14 11.16 9.97 10.86C9.79 10.56 9.94 10.43 10.09 10.28C10.22 10.15 10.39 9.95 10.54 9.8C10.69 9.65 10.74 9.53 10.64 9.33C10.54 9.13 10.02 7.9 9.82 7.4C9.63 6.9 9.43 6.88 9.15 6.88Z"></path></svg> <span class="ml-3">${contato.cta.text}</span>`;
-                ctaContato.href = contato.cta.link;
+                if(contato.cta) {
+                    const ctaContato = document.getElementById('contato-cta');
+                    ctaContato.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor"><path d="M12.04 2C6.58 2 2.13 6.45 2.13 11.91C2.13 13.66 2.61 15.35 3.48 16.84L2.06 22L7.31 20.58C8.75 21.38 10.36 21.82 12.04 21.82C17.5 21.82 21.95 17.37 21.95 11.91C21.95 9.27 20.92 6.8 19.21 4.9C17.5 3.01 14.94 2 12.04 2ZM9.15 6.88C8.94 6.88 8.74 6.88 8.53 7.29C8.33 7.7 7.68 8.31 7.68 9.44C7.68 10.57 8.56 11.64 8.71 11.82C8.85 12 10.65 14.82 13.43 16.01C15.67 16.97 16.2 16.76 16.63 16.71C17.06 16.66 18.01 16.1 18.21 15.5C18.41 14.9 18.41 14.39 18.31 14.29C18.21 14.19 18.01 14.1 17.71 13.95C17.41 13.8 16.2 13.22 15.95 13.12C15.7 13.02 15.5 12.97 15.3 13.27C15.1 13.57 14.63 14.1 14.48 14.25C14.33 14.4 14.18 14.45 13.88 14.3C13.58 14.15 12.67 13.84 11.59 12.87C10.72 12.09 10.14 11.16 9.97 10.86C9.79 10.56 9.94 10.43 10.09 10.28C10.22 10.15 10.39 9.95 10.54 9.8C10.69 9.65 10.74 9.53 10.64 9.33C10.54 9.13 10.02 7.9 9.82 7.4C9.63 6.9 9.43 6.88 9.15 6.88Z"></path></svg> <span class="ml-3">${contato.cta.text}</span>`;
+                    ctaContato.href = contato.cta.link;
+                }
             }
         }
 
         // --- Lógica Principal ---
         document.addEventListener('DOMContentLoaded', async () => {
+            // --- CORREÇÃO APLICADA AQUI ---
+            // Começamos com uma cópia completa dos dados de fallback.
+            const sections = JSON.parse(JSON.stringify(fallbackData));
+
             try {
                 const querySnapshot = await getDocs(collection(db, "siteContent"));
-                if (querySnapshot.empty) {
-                    console.warn("A coleção 'siteContent' está vazia. A usar dados de fallback.");
-                    renderContent(fallbackData);
-                } else {
-                    const sections = {};
-                    querySnapshot.forEach(doc => {
-                        sections[doc.id] = doc.data();
-                    });
-                    renderContent(sections);
-                }
+                
+                // Agora, mesclamos os dados do Firebase por cima dos dados de fallback.
+                querySnapshot.forEach(doc => {
+                    const docId = doc.id;
+                    if (sections[docId]) {
+                        // Se um campo existe no Firebase, ele substitui o do fallback.
+                        // Se não existe, o do fallback é mantido.
+                        sections[docId] = { ...sections[docId], ...doc.data() };
+                    } else {
+                        // Adiciona secções que só existem no Firebase
+                        sections[docId] = doc.data();
+                    }
+                });
+                console.log("Conteúdo carregado e mesclado do Firebase com sucesso.");
             } catch (error) {
                 console.error("Erro ao carregar do Firebase. A usar dados de fallback.", error);
-                renderContent(fallbackData);
+                // Não precisamos fazer nada aqui, pois `sections` já contém os dados de fallback.
             }
+
+            // A renderização acontece sempre, com os melhores dados disponíveis.
+            renderContent(sections);
 
             // Lógica da Calculadora
             const numCabecasSlider = document.getElementById('numCabecas');
@@ -373,9 +389,11 @@
                 perdaTotalDisplay.textContent = formatCurrency(perdaTotal);
                 perdaMediaAnimalDisplay.textContent = `com base em uma perda média de ${formatCurrency(perdaPorAnimal)} por animal.`;
             }
-            numCabecasSlider.addEventListener('input', updateCalculations);
-            valorArrobaInput.addEventListener('input', updateCalculations);
-            updateCalculations();
+            if(numCabecasSlider) {
+                numCabecasSlider.addEventListener('input', updateCalculations);
+                valorArrobaInput.addEventListener('input', updateCalculations);
+                updateCalculations();
+            }
 
             // Lógica do Header e Menu Mobile
             const header = document.getElementById('header');
@@ -387,16 +405,22 @@
                 header.classList.toggle('shadow-md', isScrolled);
                 header.classList.toggle('backdrop-blur-sm', isScrolled);
                 header.classList.toggle('bg-transparent', !isScrolled);
-                header.querySelector('h1').classList.toggle('text-white', !isScrolled);
-                header.querySelector('h1').classList.toggle('text-gray-800', isScrolled);
-                header.querySelectorAll('nav a').forEach(link => {
-                    if (!link.classList.contains('bg-yellow-500')) {
-                        link.classList.toggle('text-gray-200', !isScrolled);
-                        link.classList.toggle('hover:text-yellow-400', !isScrolled);
-                        link.classList.toggle('text-gray-600', isScrolled);
-                        link.classList.toggle('hover:text-yellow-600', isScrolled);
-                    }
+
+                const headerTitle = header.querySelector('#header-title');
+                if (headerTitle) {
+                    headerTitle.classList.toggle('text-white', !isScrolled);
+                    headerTitle.classList.toggle('text-gray-800', isScrolled);
+                }
+                
+                header.querySelectorAll('nav a:not(.bg-yellow-500)').forEach(link => {
+                    link.classList.toggle('text-gray-200', !isScrolled);
+                    link.classList.toggle('hover:text-yellow-400', !isScrolled);
+                    link.classList.toggle('text-gray-600', isScrolled);
+                    link.classList.toggle('hover:text-yellow-600', isScrolled);
                 });
+
+                mobileMenuButton.classList.toggle('text-white', !isScrolled);
+                mobileMenuButton.classList.toggle('text-gray-800', isScrolled);
             });
             mobileMenuButton.addEventListener('click', () => mobileMenu.classList.toggle('hidden'));
             document.querySelectorAll('#mobile-menu a').forEach(link => link.addEventListener('click', () => mobileMenu.classList.add('hidden')));
