@@ -7,10 +7,16 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; }
         h1, h2, h3, h4, h5, h6 { font-family: 'Poppins', sans-serif; }
+        /* Estilo para o item do menu ativo */
+        .admin-nav-link.active {
+            background-color: #f59e0b; /* bg-amber-500 */
+            color: black;
+            font-weight: 600;
+        }
     </style>
 </head>
 <body class="bg-gray-100">
@@ -39,19 +45,24 @@
 
     <!-- Painel Principal (Dashboard) -->
     <div id="dashboard-screen" class="hidden">
-        <header class="bg-white shadow">
+        <header class="bg-white shadow-md sticky top-0 z-40">
             <div class="container mx-auto px-6 py-4 flex justify-between items-center">
                 <h1 class="text-2xl font-bold text-gray-800">Painel Marruá</h1>
-                <button id="logout-button" class="font-semibold text-gray-600 hover:text-yellow-600">Sair</button>
+                <button id="logout-button" class="font-semibold text-gray-600 hover:text-yellow-600 flex items-center gap-2">
+                    Sair
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd" />
+                    </svg>
+                </button>
             </div>
         </header>
-        <main id="dashboard-content" class="container mx-auto px-6 py-8">
-            <!-- Conteúdo do admin será carregado aqui -->
-        </main>
+        <div id="dashboard-layout" class="container mx-auto px-6 py-8">
+            <!-- Layout com abas será carregado aqui -->
+        </div>
     </div>
 
     <!-- Notificação de Sucesso -->
-    <div id="notification" class="fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg hidden">
+    <div id="notification" class="fixed bottom-5 right-5 bg-green-500 text-white py-3 px-6 rounded-lg shadow-lg hidden transform transition-transform translate-y-20">
         Salvo com sucesso!
     </div>
 
@@ -62,6 +73,7 @@
         import { getFirestore, collection, getDocs, doc, setDoc } from "https://www.gstatic.com/firebasejs/9.6.7/firebase-firestore.js";
 
         const firebaseConfig = {
+          // Sua configuração do Firebase permanece aqui
           apiKey: "AIzaSyCP_QD2ekfd1qif82Eg02eKg6Xuqnsfl80",
           authDomain: "marrua-consultoria.firebaseapp.com",
           projectId: "marrua-consultoria",
@@ -77,13 +89,14 @@
 
         const loginScreen = document.getElementById('login-screen');
         const dashboardScreen = document.getElementById('dashboard-screen');
-        const dashboardContent = document.getElementById('dashboard-content');
+        const dashboardLayout = document.getElementById('dashboard-layout');
         let siteSections = {};
         
         // --- DADOS INICIAIS (Fallback) ---
         const fallbackData = {
             home: {
                 name: "Secção Principal (Hero)",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h2a1 1 0 001-1v-2a1 1 0 011-1h2a1 1 0 011 1v2a1 1 0 001 1h2a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z" /></svg>`,
                 title: 'Seu lucro não pode virar prejuízo no final da linha.',
                 subtitle: 'A Marruá Consultoria garante que cada grama do seu investimento seja valorizada no frigorífico. Atuamos onde o seu trabalho é mais vulnerável.',
                 backgroundVideoUrl: 'https://firebasestorage.googleapis.com/v0/b/platamais.firebasestorage.app/o/saude%20kangen%20brasil%2FV%C3%ADdeo%20sem%20t%C3%ADtulo.mp4?alt=media&token=78e9f776-133d-4e18-be82-556a4700bd5d',
@@ -92,11 +105,13 @@
             },
             prejuizo: {
                 name: "Calculadora de Prejuízo",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a2 2 0 00-2 2v12a2 2 0 002 2h12a2 2 0 002-2V4a2 2 0 00-2-2H4zm10 10a1 1 0 10-2 0v2a1 1 0 102 0v-2zm-4 0a1 1 0 10-2 0v2a1 1 0 102 0v-2zm-4-4a1 1 0 10-2 0v2a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v2a1 1 0 102 0V8zm4 0a1 1 0 10-2 0v2a1 1 0 102 0V8z" clip-rule="evenodd" /></svg>`,
                 title: 'Você está deixando dinheiro no frigorífico.',
                 subtitle: 'Meses de investimento em genética, nutrição e sanidade podem ser perdidos em poucas horas por falhas no processo de abate. Calcule seu prejuízo potencial e veja o quanto seu lucro está em risco.'
             },
             solucao: {
-                name: "Nossa Atuação (Funcionalidades)",
+                name: "Nossa Atuação",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M11 3a1 1 0 10-2 0v1a1 1 0 102 0V3zM15.657 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707zM18 10a1 1 0 01-1 1h-1a1 1 0 110-2h1a1 1 0 011 1zM5.05 14.95a1 1 0 001.414 1.414l.707-.707a1 1 0 00-1.414-1.414l-.707.707zM5 10a1 1 0 01-1 1H3a1 1 0 110-2h1a1 1 0 011 1zM8 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM12 16v-1a1 1 0 112 0v1a1 1 0 11-2 0zM6.343 5.757a1 1 0 00-1.414-1.414l-.707.707a1 1 0 001.414 1.414l.707-.707z" /><path d="M10 18a8 8 0 100-16 8 8 0 000 16zM10 14a4 4 0 110-8 4 4 0 010 8z" /></svg>`,
                 title: 'Mais que olhos: somos ação e correção.',
                 subtitle: 'No ambiente dinâmico do frigorífico, não adianta apenas apontar um erro. É preciso ter o conhecimento técnico e a atitude para garantir que a correção seja feita na hora. A Marruá atua como seu especialista em tempo real, defendendo cada grama do seu trabalho.',
                 features: [
@@ -107,7 +122,8 @@
                 ]
             },
             'pontos-criticos': {
-                name: "Pontos Críticos (Abas)",
+                name: "Pontos Críticos",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7a1 1 0 011.414-1.414L8 12.586V5a1 1 0 012 0v7.586l3.293-3.293a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>`,
                 title: 'Os 9 Pontos Críticos Onde Seu Lucro Desaparece',
                 subtitle: 'Pequenos erros operacionais, somados, geram um grande prejuízo. Nossa equipe técnica monitora e corrige ativamente estas falhas. Conheça cada ponto:',
                 tabs: [
@@ -124,6 +140,7 @@
             },
             contato: {
                 name: "Chamada Final (CTA)",
+                icon: `<svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z" /></svg>`,
                 title: 'Sua Próxima Abate, Zero Prejuízo.',
                 subtitle: 'Nossa confiança no resultado é total. Por isso, a primeira avaliação é um presente. Acompanhamos seu lote, identificamos as perdas e entregamos um diagnóstico completo. Sem custos, sem compromisso.',
                 backgroundImageUrl: 'https://images.unsplash.com/photo-1444956927939-0c98d03c12a8?q=80&w=2070&auto=format&fit=crop',
@@ -143,8 +160,7 @@
             }
         });
 
-        const loginForm = document.getElementById('login-form');
-        loginForm.addEventListener('submit', async (e) => {
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const email = document.getElementById('login-email').value;
             const password = document.getElementById('login-password').value;
@@ -158,13 +174,11 @@
             }
         });
 
-        const logoutButton = document.getElementById('logout-button');
-        logoutButton.addEventListener('click', () => signOut(auth));
-
+        document.getElementById('logout-button').addEventListener('click', () => signOut(auth));
 
         // --- Lógica do Dashboard ---
         async function loadDashboard() {
-            dashboardContent.innerHTML = `<p>A carregar conteúdo...</p>`;
+            dashboardLayout.innerHTML = `<p>A carregar conteúdo...</p>`;
             try {
                 const querySnapshot = await getDocs(collection(db, "siteContent"));
                 if (querySnapshot.empty) {
@@ -176,36 +190,83 @@
                         siteSections[doc.id] = { id: doc.id, ...doc.data() };
                     });
                 }
-                renderDashboard();
+                renderAdminLayout();
             } catch (error) {
-                dashboardContent.innerHTML = `<p class="text-red-500">Erro ao carregar conteúdo: ${error.message}</p>`;
+                dashboardLayout.innerHTML = `<p class="text-red-500">Erro ao carregar conteúdo: ${error.message}</p>`;
                 console.error("Erro ao carregar do Firebase, a usar dados de fallback.", error);
                 siteSections = fallbackData;
-                renderDashboard();
+                renderAdminLayout();
             }
         }
-        
-        function renderDashboard() {
+
+        function renderAdminLayout() {
             const order = ['home', 'prejuizo', 'solucao', 'pontos-criticos', 'contato'];
-            dashboardContent.innerHTML = `
-                <h2 class="text-3xl font-bold text-gray-800 mb-6">Gerir Secções do Site</h2>
-                <div class="space-y-6">
-                    ${order.map(id => renderSectionEditor(siteSections[id])).join('')}
+            
+            dashboardLayout.innerHTML = `
+                <div class="flex flex-col md:flex-row gap-8">
+                    <aside class="w-full md:w-64 flex-shrink-0">
+                        <div class="bg-white p-4 rounded-lg shadow-lg">
+                            <h3 class="font-bold text-lg mb-4 px-2">Gerir Conteúdo</h3>
+                            <nav id="admin-sidebar" class="space-y-1">
+                                ${order.map(id => {
+                                    const section = siteSections[id];
+                                    if (!section) return '';
+                                    return `<a href="#" data-section-id="${id}" class="admin-nav-link flex items-center gap-3 px-3 py-2 rounded-md text-gray-700 hover:bg-gray-200 transition-colors">
+                                                ${section.icon || ''}
+                                                <span>${section.name}</span>
+                                            </a>`;
+                                }).join('')}
+                            </nav>
+                        </div>
+                    </aside>
+                    <main id="admin-main-content" class="w-full">
+                        <!-- O editor da seção será renderizado aqui -->
+                    </main>
                 </div>
             `;
-            addSaveListeners();
+
+            const sidebar = document.getElementById('admin-sidebar');
+            sidebar.addEventListener('click', (e) => {
+                e.preventDefault();
+                const link = e.target.closest('.admin-nav-link');
+                if (link) {
+                    const sectionId = link.dataset.sectionId;
+                    
+                    // Atualiza o estado ativo
+                    sidebar.querySelectorAll('.admin-nav-link').forEach(l => l.classList.remove('active'));
+                    link.classList.add('active');
+
+                    renderSectionInMain(sectionId);
+                }
+            });
+
+            // Adiciona o listener de clique para o botão salvar usando delegação de evento
+            document.getElementById('admin-main-content').addEventListener('click', handleSaveClick);
+
+            // Renderiza a primeira seção por padrão
+            sidebar.querySelector('.admin-nav-link').click();
         }
         
+        function renderSectionInMain(sectionId) {
+            const mainContent = document.getElementById('admin-main-content');
+            const section = siteSections[sectionId];
+            if (section) {
+                mainContent.innerHTML = renderSectionEditor(section);
+            } else {
+                mainContent.innerHTML = `<p>Seção não encontrada.</p>`;
+            }
+        }
+
         function renderSectionEditor(section) {
             if (!section) return '';
             return `
-                <div id="editor-${section.id || section.name.toLowerCase()}" class="bg-white p-6 rounded-lg shadow-lg">
+                <div id="editor-${section.id}" class="bg-white p-6 rounded-lg shadow-lg">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">${section.name}</h3>
                     <div class="space-y-4">
                         ${renderFormInputs(section)}
                     </div>
                     <div class="mt-8 flex justify-end">
-                        <button data-id="${section.id || section.name.toLowerCase()}" class="save-button px-6 py-2 bg-yellow-500 text-black font-bold rounded-md hover:bg-yellow-600">Salvar Alterações</button>
+                        <button data-id="${section.id}" class="save-button px-6 py-2 bg-yellow-500 text-black font-bold rounded-md hover:bg-yellow-600 transition-colors">Salvar Alterações</button>
                     </div>
                 </div>
             `;
@@ -213,93 +274,122 @@
 
         function renderFormInputs(section) {
             let inputs = '';
-            for (const key in section) {
-                if (['id', 'type', 'name', 'features'].includes(key)) continue;
+            // Define a ordem para uma melhor organização dos campos
+            const fieldOrder = ['title', 'subtitle', 'backgroundVideoUrl', 'backgroundImageUrl', 'cta', 'secondary_cta', 'tabs'];
+            const processedKeys = new Set(['id', 'type', 'name', 'icon', 'features']);
 
-                if (key === 'tabs') {
-                    inputs += `<h4 class="font-semibold text-lg mt-6 mb-2">Abas dos Pontos Críticos</h4>`;
+            const allKeys = [...fieldOrder, ...Object.keys(section).filter(k => !fieldOrder.includes(k))];
+
+            for (const key of allKeys) {
+                if (processedKeys.has(key)) continue;
+
+                if (key === 'tabs' && Array.isArray(section.tabs)) {
+                    inputs += `<h4 class="font-semibold text-lg mt-6 mb-2 border-t pt-4">Abas dos Pontos Críticos</h4>`;
                     inputs += section.tabs.map((tab, index) => `
-                        <div class="p-4 border rounded-md space-y-3">
-                            <h5 class="font-bold">${tab.name}</h5>
-                            <label class="block text-sm font-medium text-gray-700">Título</label>
-                            <input data-key="title" data-index="${index}" class="tab-input w-full p-2 border rounded" value="${tab.title}">
-                            <label class="block text-sm font-medium text-gray-700">Conteúdo</label>
-                            <textarea data-key="content" data-index="${index}" class="tab-input w-full p-2 border rounded">${tab.content}</textarea>
-                            <label class="block text-sm font-medium text-gray-700">Prejuízo</label>
-                            <input data-key="loss" data-index="${index}" class="tab-input w-full p-2 border rounded" value="${tab.loss}">
-                            <label class="block text-sm font-medium text-gray-700">URL da Imagem</label>
-                            <input data-key="imageUrl" data-index="${index}" class="tab-input w-full p-2 border rounded" value="${tab.imageUrl}">
+                        <div class="p-4 border rounded-md space-y-3 bg-gray-50">
+                            <h5 class="font-bold">${tab.name} (Aba ${index + 1})</h5>
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Título</label>
+                                    <input data-key="title" data-index="${index}" class="tab-input w-full p-2 border rounded-md" value="${tab.title || ''}">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-gray-700">Prejuízo</label>
+                                    <input data-key="loss" data-index="${index}" class="tab-input w-full p-2 border rounded-md" value="${tab.loss || ''}">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">Conteúdo</label>
+                                <textarea data-key="content" data-index="${index}" class="tab-input w-full p-2 border rounded-md" rows="3">${tab.content || ''}</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700">URL da Imagem</label>
+                                <input data-key="imageUrl" data-index="${index}" class="tab-input w-full p-2 border rounded-md" value="${tab.imageUrl || ''}">
+                            </div>
                         </div>
                     `).join('');
                 } else if (typeof section[key] === 'object' && section[key] !== null) {
-                    inputs += `<h4 class="font-semibold text-lg mt-4 capitalize">${key.replace('_', ' ')}</h4>`;
+                    inputs += `<h4 class="font-semibold text-lg mt-4 capitalize border-t pt-4">${key.replace(/_/g, ' ')}</h4>`;
                     for (const subKey in section[key]) {
                         inputs += `
                             <div>
                                 <label class="block text-sm font-medium text-gray-700 capitalize">${subKey}</label>
-                                <input data-key="${key}.${subKey}" class="section-input w-full p-2 border rounded" value="${section[key][subKey]}">
+                                <input data-key="${key}.${subKey}" class="section-input w-full p-2 border rounded-md" value="${section[key][subKey] || ''}">
                             </div>
                         `;
                     }
                 } else {
+                     const label = key.replace(/([A-Z])/g, ' $1').replace('Url', ' URL').replace(/_/g, ' ');
                      inputs += `
                         <div>
-                            <label class="block text-sm font-medium text-gray-700 capitalize">${key.replace('Url', ' URL')}</label>
-                            <textarea data-key="${key}" class="section-input w-full p-2 border rounded">${section[key]}</textarea>
+                            <label class="block text-sm font-medium text-gray-700 capitalize">${label}</label>
+                            <textarea data-key="${key}" class="section-input w-full p-2 border rounded-md" rows="3">${section[key] || ''}</textarea>
                         </div>
                     `;
                 }
+                processedKeys.add(key);
             }
             return inputs;
         }
 
-        function addSaveListeners() {
-            document.querySelectorAll('.save-button').forEach(button => {
-                button.addEventListener('click', async (e) => {
-                    const sectionId = e.target.dataset.id;
-                    const editorDiv = document.getElementById(`editor-${sectionId}`);
-                    const updatedSection = JSON.parse(JSON.stringify(siteSections[sectionId])); // Deep copy
+        async function handleSaveClick(e) {
+            if (!e.target.matches('.save-button')) return;
 
-                    editorDiv.querySelectorAll('.section-input').forEach(input => {
-                        const keys = input.dataset.key.split('.');
-                        if (keys.length > 1) {
-                            updatedSection[keys[0]][keys[1]] = input.value;
-                        } else {
-                            updatedSection[keys[0]] = input.value;
-                        }
-                    });
+            const button = e.target;
+            const sectionId = button.dataset.id;
+            const editorDiv = document.getElementById(`editor-${sectionId}`);
+            const updatedSection = JSON.parse(JSON.stringify(siteSections[sectionId])); // Deep copy
 
-                    if (updatedSection.tabs) {
-                        editorDiv.querySelectorAll('.tab-input').forEach(input => {
-                            const index = input.dataset.index;
-                            const key = input.dataset.key;
-                            updatedSection.tabs[index][key] = input.value;
-                        });
-                    }
-                    
-                    try {
-                        e.target.innerText = "A salvar...";
-                        e.target.disabled = true;
-                        const sectionRef = doc(db, "siteContent", sectionId);
-                        // Remove 'id' se existir para não o salvar no documento
-                        delete updatedSection.id; 
-                        await setDoc(sectionRef, updatedSection);
-                        siteSections[sectionId] = { id: sectionId, ...updatedSection };
-                        showNotification();
-                    } catch (error) {
-                        alert("Erro ao salvar: " + error.message);
-                    } finally {
-                         e.target.innerText = "Salvar Alterações";
-                         e.target.disabled = false;
-                    }
-                });
+            editorDiv.querySelectorAll('.section-input').forEach(input => {
+                const keys = input.dataset.key.split('.');
+                if (keys.length > 1) {
+                    updatedSection[keys[0]][keys[1]] = input.value;
+                } else {
+                    updatedSection[keys[0]] = input.value;
+                }
             });
+
+            if (updatedSection.tabs) {
+                editorDiv.querySelectorAll('.tab-input').forEach(input => {
+                    const index = input.dataset.index;
+                    const key = input.dataset.key;
+                    updatedSection.tabs[index][key] = input.value;
+                });
+            }
+            
+            try {
+                button.innerText = "A salvar...";
+                button.disabled = true;
+                const sectionRef = doc(db, "siteContent", sectionId);
+                
+                // Remove campos que não devem ser salvos no documento
+                delete updatedSection.id; 
+                delete updatedSection.name; 
+                delete updatedSection.icon; 
+
+                await setDoc(sectionRef, updatedSection);
+                
+                // Atualiza os dados locais com os que foram salvos
+                siteSections[sectionId] = { id: sectionId, name: siteSections[sectionId].name, icon: siteSections[sectionId].icon, ...updatedSection };
+                
+                showNotification();
+            } catch (error) {
+                alert("Erro ao salvar: " + error.message);
+                console.error(error);
+            } finally {
+                 button.innerText = "Salvar Alterações";
+                 button.disabled = false;
+            }
         }
         
         function showNotification() {
             const notification = document.getElementById('notification');
             notification.classList.remove('hidden');
-            setTimeout(() => notification.classList.add('hidden'), 3000);
+            notification.classList.remove('translate-y-20');
+            setTimeout(() => {
+                notification.classList.add('translate-y-20');
+                setTimeout(() => notification.classList.add('hidden'), 300);
+            }, 3000);
         }
 
     </script>
